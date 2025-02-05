@@ -25,7 +25,7 @@ const TextEditor: React.FC = () => {
           value={content}
           onChange={setContent}
           modules={modules}
-          theme="sno  w"
+          theme="snow"
           className="border-none"
           placeholder="Description"
         />
