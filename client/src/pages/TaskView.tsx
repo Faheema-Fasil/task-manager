@@ -56,23 +56,9 @@ const TaskBuddy: React.FC = () => {
       <div className="bg-white rounded-lg shadow-md p-6">
         <Header />
 
-        <ListBoardFilter setIsAddingTask={setIsAddingTask} />
+        <ListBoardFilter setIsAddingTask={setIsAddingTask} filterTasks={filterTasks} toggleSection={toggleSection} isAddingTask={isAddingTask} handleInputChange={handleInputChange} openSections={openSections} newTask={newTask} isOpen={isAddingTask}  addTask={addTask} />
 
-        {isAddingTask && (
-          <AddTaskForm
-            newTask={newTask}
-            handleInputChange={handleInputChange}
-            addTask={addTask}
-            onCancel={() => setIsAddingTask(false)}
-          />
-        )}
-
-        <TaskList
-          title="Todo"
-          tasks={filterTasks('TO-DO')}
-          isOpen={openSections['TO-DO']}
-          onToggle={() => toggleSection('TO-DO')}
-        />
+       
         
       </div>
     </div>

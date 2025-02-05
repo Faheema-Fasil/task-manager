@@ -12,7 +12,7 @@ const TaskTableHeader: React.FC = () => (
 );
 
 
-// Example usage (you'll likely use this as part of a larger component):
+
 
 
 export default TaskTableHeader;
