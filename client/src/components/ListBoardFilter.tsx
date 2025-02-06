@@ -3,7 +3,8 @@ import list from '../assets/list.png';
 import board from '../assets/view-board.png';
 import searchicon from '../assets/search_icon.svg';
 import { useNavigate } from 'react-router-dom';
-
+import { db } from "../firebase";
+import { collection, addDoc } from "firebase/firestore";
 import TaskList from './TaskList';
 import TaskBoard from './TaskBoard';
 import CreateTask from './CreateTask';
@@ -55,7 +56,14 @@ const ListBoardFilter: React.FC<ListBoardFilterProps> = ({
   const [modalShow, setModalShow] = useState(false);
 
   const [description, setDescription] = useState("");
+  const [task, setTask] = useState("");
 
+  const addTask = async () => {
+    if (task.trim()) {
+      await addDoc(collection(db, "tasks"), { name: task });
+      setTask("");
+      
+    }}
   const handleDescriptionChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
     setDescription(event.target.value);
   };
@@ -125,6 +133,7 @@ const ListBoardFilter: React.FC<ListBoardFilterProps> = ({
             />
           </div>
           <button
+
         onClick={() => setModalShow(true)}
         className="px-6 py-3 bg-[#7B1984] text-white rounded-3xl shadow-md hover:bg-purple-700 z-50 transition duration-300"
       >
@@ -137,6 +146,10 @@ const ListBoardFilter: React.FC<ListBoardFilterProps> = ({
         onHide={() => setModalShow(false)}
         description={description}
         onChange={handleDescriptionChange}
+        onAddTask={addTask}
+        task={task}
+        setTask={setTask}
+
       />
         </div>
       </div>

@@ -14,7 +14,7 @@ interface CreateTaskProps {
     onHide: () => void;
 }
 
-const CreateTask: React.FC<CreateTaskProps & Props> = ({ description, onChange, show, onHide }) => {
+const CreateTask: React.FC<CreateTaskProps & Props> = ({ description, show, onHide }) => {
     if (!show) return null; // Hide modal when `show` is false
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);

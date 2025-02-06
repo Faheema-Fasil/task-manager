@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import TaskTableHeader from './TableHeader';
 import { IoIosArrowUp, IoIosArrowDown } from "react-icons/io";
@@ -12,6 +12,8 @@ import { BsThreeDots } from 'react-icons/bs';
 import { CiEdit } from "react-icons/ci";
 import Completed from './Completed';
 import UpdateTask from './UpdateTask';
+import { collection, getDocs } from 'firebase/firestore';
+import { db } from '../firebase';
 
 interface Task {
   id: string;
@@ -22,22 +24,28 @@ interface Task {
 }
 
 const TaskList: React.FC = () => {
-  const [tasks, setTasks] = useState<Task[]>([
-    { id: '1', name: 'Interview with Design Team', dueDate: 'Today', status: 'IN-PROGRESS', category: 'WORK' },
-    { id: '2', name: 'Team Meeting', dueDate: '30 Dec, 2024', status: 'COMPLETED', category: 'PERSONAL' },
-    { id: '3', name: 'Design a Dashboard page along with wireframes', dueDate: '31 Dec, 2024', status: 'TO-DO', category: 'WORK' },
-    { id: '4', name: 'Interview with Design Team', dueDate: 'Today', status: 'IN-PROGRESS', category: 'WORK' },
-    { id: '5', name: 'Team Meeting', dueDate: '30 Dec, 2024', status: 'COMPLETED', category: 'PERSONAL' },
-    { id: '6', name: 'Design a Dashboard page along with wireframes', dueDate: '31 Dec, 2024', status: 'TO-DO', category: 'WORK' },
-  ]);
-
+  const [tasks, setTasks] = useState<Task[]>([]);
   const [isAddingTask, setIsAddingTask] = useState(false);
   const [openToDo, setOpenToDo] = useState(true);
   const [newTask, setNewTask] = useState<Omit<Task, 'status' | 'category'>>({ name: '', dueDate: '' });
   const [menuOpenTaskId, setMenuOpenTaskId] = useState<string | null>(null);
-  const [editingTaskId, setEditingTaskId] = useState<string | null>(null);
   const [showUpdateTask, setShowUpdateTask] = useState(false);
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
+
+  useEffect(() => {
+    const fetchTasks = async () => {
+      try {
+        const querySnapshot = await getDocs(collection(db, "tasks"));
+        const taskData = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Task));
+        setTasks(taskData);
+        console.log("Tasks fetched:", taskData);
+      } catch (error) {
+        console.error("Error fetching tasks:", error);
+      }
+    };
+
+    fetchTasks();
+  }, []);
 
   const handleEdit = (id: string) => {
     const task = tasks.find(task => task.id === id);

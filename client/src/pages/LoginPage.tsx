@@ -4,11 +4,27 @@ import taskimg from "../assets/task.png";
 import image from "../assets/Screenshot.png";
 import "tailwindcss";
 import { useAuth } from "../firebase";
+import { useNavigate } from "react-router-dom";
 
-const LoginPage: React.FC = () => {
+
+export function LoginPage() {
+
   const { signInWithGoogle } = useAuth();
+  const navigate=useNavigate();
   const handleGoogleLogin = () => {
-    signInWithGoogle(); // Call googleSignIn function from firebase.ts
+    signInWithGoogle(); 
+    
+    // Call googleSignIn function from firebase.ts
+    if (signInWithGoogle) {
+      signInWithGoogle();
+      alert("Login Successful");
+      navigate('/landing');
+    } else {
+      // Handle the case where signInWithGoogle is not defined
+      alert("Login Failed");
+      console.error("signInWithGoogle is not defined");
+    }
+
   };
 
   return (
@@ -60,6 +76,10 @@ const LoginPage: React.FC = () => {
       </div>
     </div>
   );
-};
 
-export default LoginPage;
+
+
+
+
+} 
+  
