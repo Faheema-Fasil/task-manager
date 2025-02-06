@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import TaskTableHeader from './TableHeader';
 import { IoIosArrowUp, IoIosArrowDown } from "react-icons/io";
 import calenderimg from '../assets/calender_icon.svg';
@@ -24,7 +25,10 @@ const TaskList: React.FC = () => {
   const [tasks, setTasks] = useState<Task[]>([
     { id: '1', name: 'Interview with Design Team', dueDate: 'Today', status: 'IN-PROGRESS', category: 'WORK' },
     { id: '2', name: 'Team Meeting', dueDate: '30 Dec, 2024', status: 'COMPLETED', category: 'PERSONAL' },
-    { id: '3', name: 'Design a Dashboard page along with wireframes', dueDate: '31 Dec, 2024', status: 'COMPLETED', category: 'WORK' },
+    { id: '3', name: 'Design a Dashboard page along with wireframes', dueDate: '31 Dec, 2024', status: 'TO-DO', category: 'WORK' },
+    { id: '4', name: 'Interview with Design Team', dueDate: 'Today', status: 'IN-PROGRESS', category: 'WORK' },
+    { id: '5', name: 'Team Meeting', dueDate: '30 Dec, 2024', status: 'COMPLETED', category: 'PERSONAL' },
+    { id: '6', name: 'Design a Dashboard page along with wireframes', dueDate: '31 Dec, 2024', status: 'TO-DO', category: 'WORK' },
   ]);
 
   const [isAddingTask, setIsAddingTask] = useState(false);
@@ -78,6 +82,24 @@ const TaskList: React.FC = () => {
   const handleSaveTask = (updatedTask: Task) => {
     setTasks(tasks.map(task => task.id === updatedTask.id ? updatedTask : task));
     setShowUpdateTask(false);
+  };
+
+  const onDragEnd = (result: any) => {
+    const { destination, source } = result;
+
+    if (!destination) {
+      return;
+    }
+
+    if (destination.droppableId === source.droppableId && destination.index === source.index) {
+      return;
+    }
+
+    const newTasks = Array.from(tasks);
+    const [removed] = newTasks.splice(source.index, 1);
+    newTasks.splice(destination.index, 0, removed);
+
+    setTasks(newTasks);
   };
 
   return (
@@ -147,56 +169,70 @@ const TaskList: React.FC = () => {
                 </div>
               </div>
             )}
-            <div className=' min-h-30'>
-              {tasks.map((task, index) => (
-                <div key={index} className="flex items-center justify-between p-3 border-b border-gray-300 hover:bg-gray-50 transition">
-                  <div className='flex items-center gap-1 w-5/12'>
-                    <input type="checkbox" className="" />
-                    <div className="w-100 flex items-center">
-                      <button>
-                        <img src={dragicon} alt="" />
-                      </button>
-                      <span className='mr-2'><MdCheckCircle /></span>
-                      <p className='flex-1'>{task.name}</p>
-                    </div>
-                  </div>
-                  <div className="w-3/12 text-gray-500">{task.dueDate}</div>
-                  <div className="w-2/12 flex items-center">
-                    <button onClick={() => updateTaskStatus(task.id, task.status === 'TO-DO' ? 'IN-PROGRESS' : task.status === 'IN-PROGRESS' ? 'COMPLETED' : 'TO-DO')} className="bg-gray-200 text-gray-600 px-2 py-1 rounded text-xs mr-2">{task.status}</button>
-                  </div>
-                  <div className="w-2/12 flex items-center">
-                    <span className="px-2 py-1 rounded text-xs">{task.category}</span>
-                  </div>
-                  <div className="relative">
-                    <button onClick={() => setMenuOpenTaskId(task.id === menuOpenTaskId ? null : task.id)}>
-                      <BsThreeDots />
-                    </button>
-                    {menuOpenTaskId === task.id && (
-                      <div className="absolute right-0 bg-white shadow-md text-sm rounded-md p-2 w-40">
-                        <button
-                          className="block w-full text-left hover:text-indigo-500 mb-1"
-                          onClick={() => handleEdit(task.id)}
-                        >
-                          <div className='flex items-center gap-1'>
-                            <CiEdit/>
-                            <span>Edit</span>
-                          </div> 
-                        </button>
-                        <button
-                          className="block w-full text-left hover:text-black"
-                          onClick={() => handleDelete(task.id)}
-                        >
-                          <div className='flex items-center gap-1'>
-                            <MdDelete className='text-red-500'/>
-                            <span className='text-red-500'>Delete</span>
+            <DragDropContext onDragEnd={onDragEnd}>
+              <Droppable droppableId="todo">
+                {(provided) => (
+                  <div className='min-h-30' ref={provided.innerRef} {...provided.droppableProps}>
+                    {tasks.filter(task => task.status === 'TO-DO').map((task, index) => (
+                      <Draggable key={task.id} draggableId={task.id} index={index}>
+                        {(provided) => (
+                          <div
+                            ref={provided.innerRef}
+                            {...provided.draggableProps}
+                            {...provided.dragHandleProps}
+                            className="flex items-center justify-between p-3 border-b border-gray-300 hover:bg-gray-50 transition"
+                          >
+                            <div className='flex items-center gap-1 w-7/12'>
+                              <input type="checkbox" className="" />
+                              <div className="w-100 flex items-center">
+                                <img src={dragicon} alt="" className='cursor-move' />
+                                <span className='mr-2'><MdCheckCircle /></span>
+                                <p className='flex-1'>{task.name}</p>
+                              </div>
+                            </div>
+                            <div className="w-3/12 text-gray-500">{task.dueDate}</div>
+                            <div className="w-2/12 flex items-center">
+                              <button onClick={() => updateTaskStatus(task.id, task.status === 'TO-DO' ? 'IN-PROGRESS' : task.status === 'IN-PROGRESS' ? 'COMPLETED' : 'TO-DO')} className="bg-gray-200 text-gray-600 px-2 py-1 rounded text-xs mr-2">{task.status}</button>
+                            </div>
+                            <div className="w-2/12 flex items-center">
+                              <span className="px-2 py-1 rounded text-xs">{task.category}</span>
+                            </div>
+                            <div className="relative">
+                              <button onClick={() => setMenuOpenTaskId(task.id === menuOpenTaskId ? null : task.id)}>
+                                <BsThreeDots />
+                              </button>
+                              {menuOpenTaskId === task.id && (
+                                <div className="absolute right-0 bg-white shadow-md text-sm rounded-md p-2 w-40">
+                                  <button
+                                    className="block w-full text-left hover:text-indigo-500 mb-1"
+                                    onClick={() => handleEdit(task.id)}
+                                  >
+                                    <div className='flex items-center gap-1'>
+                                      <CiEdit/>
+                                      <span>Edit</span>
+                                    </div> 
+                                  </button>
+                                  <button
+                                    className="block w-full text-left hover:text-black"
+                                    onClick={() => handleDelete(task.id)}
+                                  >
+                                    <div className='flex items-center gap-1'>
+                                      <MdDelete className='text-red-500'/>
+                                      <span className='text-red-500'>Delete</span>
+                                    </div>
+                                  </button>
+                                </div>
+                              )}
+                            </div>
                           </div>
-                        </button>
-                      </div>
-                    )}
+                        )}
+                      </Draggable>
+                    ))}
+                    {provided.placeholder}
                   </div>
-                </div>
-              ))}
-            </div>
+                )}
+              </Droppable>
+            </DragDropContext>
           </div>
         )}
       </div>

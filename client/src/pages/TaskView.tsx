@@ -52,8 +52,8 @@ const TaskBuddy: React.FC = () => {
     setOpenSections({ ...openSections, [status]: !openSections[status] });
 
   return (
-    <div className="container mx-auto p-4 bg-gray-100 min-h-screen">
-      <div className="bg-white rounded-lg shadow-md p-6">
+    <div className="">
+      <div className="bg-white rounded-lg shadow-md p-15">
         <Header />
 
         <ListBoardFilter setIsAddingTask={setIsAddingTask} filterTasks={filterTasks} toggleSection={toggleSection} isAddingTask={isAddingTask} handleInputChange={handleInputChange} openSections={openSections} newTask={newTask} isOpen={isAddingTask}  addTask={addTask} />

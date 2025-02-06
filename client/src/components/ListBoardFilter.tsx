@@ -13,7 +13,38 @@ interface ListBoardFilterProps {
   toggleSection: (section: string) => void;
   openSections: { [key: string]: boolean };
 }
-
+const CategoryOptions=[
+  {
+    value:"WORK",
+    label:"Work"
+  },
+  {
+    value:"PERSONAL",
+    label:"Personal"
+  }
+]
+const dueDateOptions = [
+  {
+    value: "Today",
+    label: "Today",
+  },
+  {
+    value: "Tomorrow",
+    label: "Tomorrow",
+  },
+  {
+    value: "This Week",
+    label: "This Week",
+  },
+  {
+    value: "This Month",
+    label: "This Month",
+  },
+  {
+    value: "This Year",
+    label: "This Year",
+  },
+]
 const ListBoardFilter: React.FC<ListBoardFilterProps> = ({
   filterTasks,
   toggleSection,
@@ -43,14 +74,16 @@ const ListBoardFilter: React.FC<ListBoardFilterProps> = ({
       <div className="flex items-center justify-between mb-4">
         <div className="flex">
           <button
-            className="mr-2 text-gray-600 flex items-center hover:border-b-2"
+            className="mr-2 text-gray-600 flex items-center border-b-2 hover:border-b-2"
             onClick={() => setOpenList(true)}
+            style={{ borderBottom: openList ? '2px solid #000' : '2px solid transparent' }}
           >
             <img src={list} alt="" /> <span>List</span>
           </button>
           <button
             className="text-gray-600 flex items-center hover:border-b-2"
             onClick={handleBoardClick}
+            style={{ borderBottom: !openList ? '2px solid #000' : '2px solid transparent' }}
           >
             <img src={board} alt="" /> <span>Board</span>
           </button>
@@ -59,11 +92,22 @@ const ListBoardFilter: React.FC<ListBoardFilterProps> = ({
       <div className="flex items-center justify-between">
         <div className="flex items-center">
           <div className="mr-4 text-gray-500">Filter by: </div>
-          <select className="border border-gray-300 text-sm text-gray-500 rounded-full px-2 py-1 mr-2">
-            <option>Category</option>
+          <select className="border bg-white border-gray-300 text-sm text-gray-500 rounded-full px-2 py-1 mr-2">
+            
+            <option className='text-gray-500' selected disabled>Category</option>
+            {CategoryOptions.map((option) => (
+              <option key={option.value} style={{ color: 'black', backgroundColor: 'white', fontWeight: 'bold' }} value={option.value}>
+                {option.label}
+              </option>
+            ))}
           </select>
           <select className="border border-gray-300 text-sm text-gray-500 rounded-full px-2 py-1 mr-2">
-            <option>Due Date</option>
+            <option selected disabled>Due Date</option>
+            {dueDateOptions.map((option) => (
+              <option key={option.value} style={{ color: 'black', backgroundColor: 'white', fontWeight: 'bold' }} value={option.value}>
+                {option.label}
+              </option>
+            ))}
           </select>
         </div>
         <div className="flex items-center gap-8">
