@@ -33,15 +33,15 @@ const CreateTask: React.FC<CreateTaskProps & Props> = ({ description, onChange, 
 
     return (
         <div
-            className="fixed inset-0 bg-black/50   flex justify-center items-center z-50"
+            className="fixed inset-0 bg-black/50   flex justify-center text-sm items-center z-50"
         >
             <div className="bg-white  rounded-3xl shadow-lg w-200  ">
                 {/* Modal Header */}
-                <div className="flex justify-between items-center border-gray-300 border-b p-2">
+                <div className="flex justify-between items-center border-gray-300 border-b p-3">
                     <h2 className="text-xl text-gray-600 p-2">Create Task</h2>
                     <button
                         onClick={onHide}
-                        className="text-gray-500 hover:text-red-600 transition duration-200"
+                        className="text-gray-500 mr-2 hover:text-red-600 transition text-lg duration-200"
                     >
                         ✖
                     </button>

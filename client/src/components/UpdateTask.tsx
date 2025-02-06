@@ -69,13 +69,13 @@ const UpdateTask: React.FC<UpdateTaskProps> = ({ task, show, onHide, onSave }) =
                 <div className="fixed inset-0 bg-black/50 flex justify-center items-center text-sm z-50">
                     <div className="bg-white  rounded-3xl p-4 shadow-lg w-250 relative">
                         <div className='border-b w-full border-gray-300 py-8'>
-                            <button onClick={onHide} className="absolute  top-4 right-4 text-gray-500 hover:text-red-600">
+                            <button onClick={onHide} className="absolute  top-4 mr-2 text-bold text-2xl right-4 text-gray-500 hover:text-red-600">
                                 <IoMdClose size={24} />
                             </button>
                         </div>
                         <div className='flex w-full justify-between'>
 
-                            <div className= 'w-7/12  '>
+                            <div className= 'w-7/12  max-h-100 overflow-y-auto'>
 
                                 <div className="p-6 snap-y mb-25">
                                     <input
@@ -158,8 +158,8 @@ const UpdateTask: React.FC<UpdateTaskProps> = ({ task, show, onHide, onSave }) =
 
                                
                             </div>
-                            <div className='w-5/12'>
-                                <div className='flex items-center px-1 gap-2 py-4 border border-gray-300'>
+                            <div className='w-5/12 bg-gray-100'>
+                                <div className='flex items-center px-3 bg-white gap-2 py-4 border text-lg border-gray-300'>
                                     Activity
                                 </div>
                                 <ul className='p-2 flex flex-col gap-3 text-gray-600 bg-gray-100 min-h-auto'>
