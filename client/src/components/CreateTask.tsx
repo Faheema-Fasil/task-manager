@@ -1,6 +1,6 @@
 import React, { useRef, useState } from "react";
 import TextEditor from "./Quill";
-import { FaCheck } from "react-icons/fa";
+
 
 
 // Modal Component
