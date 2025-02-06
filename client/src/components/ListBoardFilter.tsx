@@ -4,7 +4,7 @@ import board from '../assets/view-board.png';
 import searchicon from '../assets/search_icon.svg';
 import { useNavigate } from 'react-router-dom';
 import { db } from "../firebase";
-import { collection, addDoc } from "firebase/firestore";
+import { collection, addDoc, Timestamp } from "firebase/firestore";
 import TaskList from './TaskList';
 import TaskBoard from './TaskBoard';
 import CreateTask from './CreateTask';
@@ -14,38 +14,20 @@ interface ListBoardFilterProps {
   toggleSection: (section: string) => void;
   openSections: { [key: string]: boolean };
 }
-const CategoryOptions=[
-  {
-    value:"WORK",
-    label:"Work"
-  },
-  {
-    value:"PERSONAL",
-    label:"Personal"
-  }
-]
+
+const CategoryOptions = [
+  { value: "WORK", label: "Work" },
+  { value: "PERSONAL", label: "Personal" }
+];
+
 const dueDateOptions = [
-  {
-    value: "Today",
-    label: "Today",
-  },
-  {
-    value: "Tomorrow",
-    label: "Tomorrow",
-  },
-  {
-    value: "This Week",
-    label: "This Week",
-  },
-  {
-    value: "This Month",
-    label: "This Month",
-  },
-  {
-    value: "This Year",
-    label: "This Year",
-  },
-]
+  { value: "Today", label: "Today" },
+  { value: "Tomorrow", label: "Tomorrow" },
+  { value: "This Week", label: "This Week" },
+  { value: "This Month", label: "This Month" },
+  { value: "This Year", label: "This Year" },
+];
+
 const ListBoardFilter: React.FC<ListBoardFilterProps> = ({
   filterTasks,
   toggleSection,
@@ -54,19 +36,36 @@ const ListBoardFilter: React.FC<ListBoardFilterProps> = ({
   const navigate = useNavigate();
   const [openList, setOpenList] = useState(true);
   const [modalShow, setModalShow] = useState(false);
-
   const [description, setDescription] = useState("");
   const [task, setTask] = useState("");
 
-  const addTask = async () => {
-    if (task.trim()) {
-      await addDoc(collection(db, "tasks"), { name: task });
-      setTask("");
-      
-    }}
+  // Function to add a task to Firestore
+  const addTask = async (taskData: { title: string; description: string; due: Date; category: string; status: string }) => {
+    if (taskData.title.trim()) {
+      try {
+        // Add the task to Firestore
+        await addDoc(collection(db, "tasks"), {
+          title: taskData.title,
+          description: taskData.description,
+          dueDate: Timestamp.fromDate(taskData.due),
+          category: taskData.category,
+          status: taskData.status,
+          createdAt: Timestamp.now(),
+        });
+        console.log("Task added successfully!");
+        setTask(""); // Clear the task input
+        setDescription(""); // Clear the description input
+        setModalShow(false); // Close the modal
+      } catch (error) {
+        console.error("Error adding task: ", error);
+      }
+    }
+  };
+
   const handleDescriptionChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
     setDescription(event.target.value);
   };
+
   const handleSearchClick = () => {
     navigate('/search');
   };
@@ -74,8 +73,6 @@ const ListBoardFilter: React.FC<ListBoardFilterProps> = ({
   const handleBoardClick = () => {
     setOpenList(false);
   };
-
-
 
   return (
     <div>
@@ -101,7 +98,6 @@ const ListBoardFilter: React.FC<ListBoardFilterProps> = ({
         <div className="flex items-center">
           <div className="mr-4 text-gray-500">Filter by: </div>
           <select className="border bg-white border-gray-300 text-sm text-gray-500 rounded-full px-2 py-1 mr-2">
-            
             <option className='text-gray-500' selected disabled>Category</option>
             {CategoryOptions.map((option) => (
               <option key={option.value} style={{ color: 'black', backgroundColor: 'white', fontWeight: 'bold' }} value={option.value}>
@@ -133,28 +129,24 @@ const ListBoardFilter: React.FC<ListBoardFilterProps> = ({
             />
           </div>
           <button
+            onClick={() => setModalShow(true)}
+            className="px-6 py-3 bg-[#7B1984] text-white rounded-3xl shadow-md hover:bg-purple-700 z-50 transition duration-300"
+          >
+            ADD TASK
+          </button>
 
-        onClick={() => setModalShow(true)}
-        className="px-6 py-3 bg-[#7B1984] text-white rounded-3xl shadow-md hover:bg-purple-700 z-50 transition duration-300"
-      >
-        ADD TASK
-      </button>
-
-      {/* Tailwind Modal */}
-      <CreateTask
-        show={modalShow}
-        onHide={() => setModalShow(false)}
-        description={description}
-        onChange={handleDescriptionChange}
-        onAddTask={addTask}
-        task={task}
-        setTask={setTask}
-
-      />
+          {/* Modal for creating a task */}
+          <CreateTask
+            show={modalShow}
+            onHide={() => setModalShow(false)}
+            description={description}
+            onChange={handleDescriptionChange}
+            onAddTask={addTask}
+            task={task}
+            setTask={setTask}
+          />
         </div>
       </div>
-
-
 
       {openList ? (
         <TaskList

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
+import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd/dist/react-beautiful-dnd.esm';
 import TaskTableHeader from './TableHeader';
 import { IoIosArrowUp, IoIosArrowDown } from "react-icons/io";
 import calenderimg from '../assets/calender_icon.svg';
@@ -12,13 +12,13 @@ import { BsThreeDots } from 'react-icons/bs';
 import { CiEdit } from "react-icons/ci";
 import Completed from './Completed';
 import UpdateTask from './UpdateTask';
-import { collection, getDocs } from 'firebase/firestore';
+import { collection, getDocs, Timestamp } from 'firebase/firestore';
 import { db } from '../firebase';
 
 interface Task {
   id: string;
-  name: string;
-  dueDate: string;
+  title: string;
+  due: Timestamp;
   status: 'TO-DO' | 'IN-PROGRESS' | 'COMPLETED';
   category: 'WORK' | 'PERSONAL';
 }
@@ -27,7 +27,7 @@ const TaskList: React.FC = () => {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [isAddingTask, setIsAddingTask] = useState(false);
   const [openToDo, setOpenToDo] = useState(true);
-  const [newTask, setNewTask] = useState<Omit<Task, 'status' | 'category'>>({ name: '', dueDate: '' });
+  const [newTask, setNewTask] = useState<Omit<Task, 'status' | 'category'>>({ title: '', due: Timestamp.now() });
   const [menuOpenTaskId, setMenuOpenTaskId] = useState<string | null>(null);
   const [showUpdateTask, setShowUpdateTask] = useState(false);
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
@@ -35,7 +35,7 @@ const TaskList: React.FC = () => {
   useEffect(() => {
     const fetchTasks = async () => {
       try {
-        const querySnapshot = await getDocs(collection(db, "tasks"));
+        const querySnapshot = await getDocs(collection(db, "task"));
         const taskData = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Task));
         setTasks(taskData);
         console.log("Tasks fetched:", taskData);
@@ -60,9 +60,9 @@ const TaskList: React.FC = () => {
   };
 
   const addTask = () => {
-    if (!newTask.name || !newTask.dueDate) return;
+    if (!newTask.title || !newTask.due) return;
     setTasks([...tasks, { ...newTask, status: 'TO-DO', category: 'WORK', id: (tasks.length + 1).toString() }]);
-    setNewTask({ name: '', dueDate: '' });
+    setNewTask({ title: '', due: Timestamp.now() });
     setIsAddingTask(false);
   };
 
@@ -77,10 +77,10 @@ const TaskList: React.FC = () => {
   const handleDateClick = () => {
     const datePicker = document.createElement("input");
     datePicker.type = "date";
-    datePicker.value = newTask.dueDate || "";
+    datePicker.value = newTask.due.toDate().toISOString().split('T')[0];
     datePicker.className = "absolute opacity-0 pointer-events-none";
     datePicker.addEventListener("change", () => {
-      setNewTask((prev) => ({ ...prev, dueDate: datePicker.value }));
+      setNewTask((prev) => ({ ...prev, due: Timestamp.fromDate(new Date(datePicker.value)) }));
       datePicker.remove();
     });
     document.body.appendChild(datePicker);
@@ -136,9 +136,9 @@ const TaskList: React.FC = () => {
                 <div className='flex items-center px-8 mr-50 justify-between mx-5'>
                   <input
                     type="text"
-                    name="name"
+                    name="title"
                     placeholder="Task Title"
-                    value={newTask.name}
+                    value={newTask.title}
                     onChange={handleInputChange}
                     className="border-none text-sm rounded mb-2"
                   />
@@ -168,7 +168,7 @@ const TaskList: React.FC = () => {
                   </div>
                 </div>
                 <div className="flex mt-2 mx-13">
-                  <button onClick={addTask} className="bg-[#7B1984] flex items-center gap-2 text-white px-3 rounded-full" disabled={!newTask.name || !newTask.dueDate}>
+                  <button onClick={addTask} className="bg-[#7B1984] flex items-center gap-2 text-white px-3 rounded-full" disabled={!newTask.title || !newTask.due}>
                     <span className='text-xs'>ADD </span>  <img src={union} alt="" />
                   </button>
                   <button onClick={() => setIsAddingTask(false)} className="rounded px-4 py-2">
@@ -195,10 +195,10 @@ const TaskList: React.FC = () => {
                               <div className="w-100 flex items-center">
                                 <img src={dragicon} alt="" className='cursor-move' />
                                 <span className='mr-2'><MdCheckCircle /></span>
-                                <p className='flex-1'>{task.name}</p>
+                                <p className='flex-1'>{task.title}</p>
                               </div>
                             </div>
-                            <div className="w-3/12 text-gray-500">{task.dueDate}</div>
+                            <div className="w-3/12 text-gray-500">{task.due.toDate().toLocaleDateString()}</div>
                             <div className="w-2/12 flex items-center">
                               <button onClick={() => updateTaskStatus(task.id, task.status === 'TO-DO' ? 'IN-PROGRESS' : task.status === 'IN-PROGRESS' ? 'COMPLETED' : 'TO-DO')} className="bg-gray-200 text-gray-600 px-2 py-1 rounded text-xs mr-2">{task.status}</button>
                             </div>

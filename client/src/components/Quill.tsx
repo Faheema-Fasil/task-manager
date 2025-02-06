@@ -20,14 +20,14 @@ const TextEditor: React.FC = () => {
   };
 
   return (
-    <div className="mt-4 border rounded-lg border-gray-300 overflow-hidden">
-      <div className="quill-top-editor">
+    <div className="mt-4 border w-full min-h-[150px] rounded-lg border-gray-300 overflow-hidden">
+      <div className="quill-editor">
         <ReactQuill
           value={content}
           onChange={setContent}
           modules={modules}
           theme="snow"
-          className=""
+          className="quill-top-editor"
           placeholder="Description"
         />
       </div>
