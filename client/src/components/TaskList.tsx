@@ -18,7 +18,7 @@ import { db } from '../firebase';
 interface Task {
   id: string;
   title: string;
-  due: Timestamp;
+  dueDate: Timestamp;
   status: 'TO-DO' | 'IN-PROGRESS' | 'COMPLETED';
   category: 'WORK' | 'PERSONAL';
 }
@@ -35,17 +35,28 @@ const TaskList: React.FC = () => {
   useEffect(() => {
     const fetchTasks = async () => {
       try {
-        const querySnapshot = await getDocs(collection(db, "task"));
-        const taskData = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Task));
+        const querySnapshot = await getDocs(collection(db, "tasks"));
+        const taskData = querySnapshot.docs.map(doc => {
+          const data = doc.data();
+          return {
+            id: doc.id,
+            ...data,
+            due: data.due ? data.due.toDate() : null,
+            createdAt: data.createdAt ? data.createdAt.toDate() : null,
+          } as Task;
+        }, );
+        
+  
         setTasks(taskData);
         console.log("Tasks fetched:", taskData);
       } catch (error) {
         console.error("Error fetching tasks:", error);
       }
     };
-
+  
     fetchTasks();
   }, []);
+  
 
   const handleEdit = (id: string) => {
     const task = tasks.find(task => task.id === id);
@@ -77,7 +88,7 @@ const TaskList: React.FC = () => {
   const handleDateClick = () => {
     const datePicker = document.createElement("input");
     datePicker.type = "date";
-    datePicker.value = newTask.due.toDate().toISOString().split('T')[0];
+    datePicker.value = newTask.dueDate ? newTask.dueDate.toDate().toISOString().split('T')[0] : "";
     datePicker.className = "absolute opacity-0 pointer-events-none";
     datePicker.addEventListener("change", () => {
       setNewTask((prev) => ({ ...prev, due: Timestamp.fromDate(new Date(datePicker.value)) }));
@@ -86,6 +97,7 @@ const TaskList: React.FC = () => {
     document.body.appendChild(datePicker);
     datePicker.click();
   };
+  
 
   const handleSaveTask = (updatedTask: Task) => {
     setTasks(tasks.map(task => task.id === updatedTask.id ? updatedTask : task));
@@ -198,7 +210,7 @@ const TaskList: React.FC = () => {
                                 <p className='flex-1'>{task.title}</p>
                               </div>
                             </div>
-                            <div className="w-3/12 text-gray-500">{task.due.toDate().toLocaleDateString()}</div>
+                            <div className="w-3/12 text-gray-500">{task.dueDate.toDate().toLocaleDateString()}</div>
                             <div className="w-2/12 flex items-center">
                               <button onClick={() => updateTaskStatus(task.id, task.status === 'TO-DO' ? 'IN-PROGRESS' : task.status === 'IN-PROGRESS' ? 'COMPLETED' : 'TO-DO')} className="bg-gray-200 text-gray-600 px-2 py-1 rounded text-xs mr-2">{task.status}</button>
                             </div>

@@ -40,27 +40,30 @@ const ListBoardFilter: React.FC<ListBoardFilterProps> = ({
   const [task, setTask] = useState("");
 
   // Function to add a task to Firestore
-  const addTask = async (taskData: { title: string; description: string; due: Date; category: string; status: string }) => {
+  const addTask = async (taskData: { title: string; description: string; due?: Date; category: string; status: string }) => {
     if (taskData.title.trim()) {
       try {
-        // Add the task to Firestore
+        const dueDate = taskData.due instanceof Date ? taskData.due : new Date(); // Default to current date if undefined
+  
         await addDoc(collection(db, "tasks"), {
           title: taskData.title,
           description: taskData.description,
-          dueDate: Timestamp.fromDate(taskData.due),
+          dueDate: Timestamp.fromDate(dueDate),
           category: taskData.category,
           status: taskData.status,
           createdAt: Timestamp.now(),
         });
+  
         console.log("Task added successfully!");
-        setTask(""); // Clear the task input
-        setDescription(""); // Clear the description input
-        setModalShow(false); // Close the modal
+        setTask(""); 
+        setDescription(""); 
+        setModalShow(false);
       } catch (error) {
         console.error("Error adding task: ", error);
       }
     }
   };
+  
 
   const handleDescriptionChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
     setDescription(event.target.value);
