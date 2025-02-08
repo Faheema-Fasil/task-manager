@@ -28,7 +28,7 @@ interface TaskListComponentProps {
   updateTaskStatus: (id: string, status: Task["status"]) => void;
   menuOpenTaskId: string | null;
   setMenuOpenTaskId: React.Dispatch<React.SetStateAction<string | null>>;
-  handleDelete: (id: string) => void;
+  deleteTask: (id: string) => void;
   handleEdit: (id: string) => void;
   setTasks: React.Dispatch<React.SetStateAction<Task[]>>;
   editTask: (task: Partial<Task>) => Promise<void>;
@@ -41,7 +41,7 @@ const TaskListComponent: React.FC<TaskListComponentProps> = ({
   updateTaskStatus,
   menuOpenTaskId,
   setMenuOpenTaskId,
-  handleDelete,
+  deleteTask,
   handleEdit,
   setTasks,
   editTask,
@@ -133,7 +133,7 @@ const TaskListComponent: React.FC<TaskListComponentProps> = ({
                         <span>Edit</span>
                       </div>
                     </button>
-                    <button className="block w-full text-left hover:text-black" onClick={() => handleDelete(task.id)}>
+                    <button className="block w-full text-left hover:text-black" onClick={() => deleteTask(task.id)}>
                       <div className="flex items-center gap-1">
                         <MdDelete className="text-red-500" />
                         <span className="text-red-500">Delete</span>

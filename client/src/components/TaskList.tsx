@@ -18,11 +18,13 @@ const TaskList = ({
   setTasks,
   filteredTasks,
   editTask,
+  deleteTask,
 }: {
   tasks: Task[];
   filteredTasks: any;
   setTasks: any;
   editTask:any;
+  deleteTask:any;
 }) => {
   const [isAddingTask, setIsAddingTask] = useState(false);
   const [openToDo, setOpenToDo] = useState(true);
@@ -327,7 +329,7 @@ const TaskList = ({
                           Edit
                         </button>
                         <button
-                          onClick={() => handleDelete(task.id)}
+                          onClick={() => deleteTask(task.id)}
                           className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left"
                         >
                           Delete
@@ -349,7 +351,7 @@ const TaskList = ({
           updateTaskStatus={updateTaskStatus}
           menuOpenTaskId={menuOpenTaskId}
           setMenuOpenTaskId={setMenuOpenTaskId}
-          handleDelete={handleDelete}
+          deleteTask={deleteTask}
           handleEdit={handleEdit}
           setTasks={setTasks}
           editTask={editTask}
@@ -363,7 +365,7 @@ const TaskList = ({
           updateTaskStatus={updateTaskStatus}
           menuOpenTaskId={menuOpenTaskId}
           setMenuOpenTaskId={setMenuOpenTaskId}
-          handleDelete={handleDelete}
+          deleteTask={deleteTask}
           handleEdit={handleEdit}
           setTasks={setTasks}
           editTask={editTask}

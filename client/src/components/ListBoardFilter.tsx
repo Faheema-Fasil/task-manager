@@ -11,6 +11,7 @@ import {
   getDocs,
   updateDoc,
   doc,
+  deleteDoc,
 } from "firebase/firestore";
 import TaskList from "./TaskList";
 import TaskBoard from "./TaskBoard";
@@ -165,6 +166,15 @@ const ListBoardFilter: React.FC<ListBoardFilterProps> = ({
       fetchTasks();
     } catch (error) {
       console.error("Error editing task: ", error);
+    }
+  };
+  const deleteTask = async (taskId: string) => {
+    try {
+      await deleteDoc(doc(db, "tasks", taskId));
+      console.log("Task deleted successfully!");
+      fetchTasks();
+    } catch (error) {
+      console.error("Error deleting task: ", error);
     }
   };
 
@@ -466,6 +476,7 @@ const ListBoardFilter: React.FC<ListBoardFilterProps> = ({
         <TaskList
           title="In Progress"
           editTask={editTask}
+          deleteTask={deleteTask}
           setTasks={setTasks}
           filteredTasks={filteredTasks ? filteredTasks : tasks}
           tasks={filteredTasks ? filteredTasks : tasks}
