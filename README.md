@@ -16,18 +16,17 @@ A fully responsive task management application built with React, Firebase, and D
  Tech Stack
   
   Frontend
-        React (TypeScript)
-        React Router (Navigation)
-        MUI, Bootstrap, MDB React UI Kit, Tailwind CSS, Emotion (UI Components)
-        React DND
-        React Drag-and-Drop
+         1. React (TypeScript)
+         2. React Router (Navigation)
+         3. MUI, Bootstrap, MDB React UI Kit, Tailwind CSS, Emotion (UI Components)
+         4. React DND 
         
   Backend & Database
-        Firebase Firestore (Real-time Database)
-        Firebase Authentication (Google Sign-In)
-        Development & Build Tools
-        Vite (Fast Development Build)
-        TypeScript (Strong Typing)
+        1. Firebase Firestore (Real-time Database)
+        2. Firebase Authentication (Google Sign-In)
+        3. Development & Build Tools
+        4. Vite (Fast Development Build)
+        5. TypeScript (Strong Typing)
         
  Installation & Setup
  
