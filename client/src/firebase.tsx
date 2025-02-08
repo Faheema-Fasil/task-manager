@@ -1,71 +1,13 @@
-// import { initializeApp } from "firebase/app";
-// import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged, User } from "firebase/auth";
-// import { useState, useEffect, createContext, useContext, ReactNode } from "react";
-
-// Firebase configuration (use your own credentials from Firebase Console)
-
-// // Create context for auth state
-// interface AuthContextType {
-  //   currentUser: User | null;
-  //   logout: () => Promise<void>;
-// }
-
-// const AuthContext = createContext<AuthContextType | null>(null);
-
-// // Custom hook to use Auth context
-// export const useAuth = () => {
-  //   const context = useContext(AuthContext);
-//   if (!context) {
-//     throw new Error("useAuth must be used within an AuthProvider");
-//   }
-//   return context;
-// };
-
-// // AuthProvider component to wrap your app and provide auth context
-// // export const AuthProvider = ({ children }: { children: ReactNode }) => {
-// //   const [currentUser, setCurrentUser] = useState<User | null>(null);
-
-// //   useEffect(() => {
-// //     const unsubscribe = onAuthStateChanged(auth, (user) => {
-// //       setCurrentUser(user);
-// //     });
-// //     return () => unsubscribe();
-// //   }, []);
-
-// //   const logout = async () => {
-  // //     try {
-// //       await signOut(auth);
-// //     } catch (error) {
-// //       console.error("Error logging out: ", error);
-// //     }
-// //   };
-
-// //   return (
-// //     <AuthContext.Provider value={{ currentUser, logout }}>
-// //       {children}
-// //     </AuthContext.Provider>
-// //   );
-// // };
-
-// // Google sign-in functionality
-// const provider = new GoogleAuthProvider();
-
-// export const googleSignIn = async () => {
-  //   try {
-//     const result = await signInWithPopup(auth, provider);
-//     const user = result.user;
-//     console.log("User signed in: ", user);
-//     // Handle the user object here (e.g., save to context or redirect)
-//   } catch (error) {
-  //     console.error("Error signing in with Google: ", error);
-//   }
-// };
-
-import React, { createContext, useContext, useState, useEffect } from 'react';
-import { getAuth, onAuthStateChanged, signOut, signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
-import { initializeApp } from 'firebase/app';
+import React, { createContext, useContext, useState, useEffect } from "react";
+import {
+  getAuth,
+  onAuthStateChanged,
+  signOut,
+  signInWithPopup,
+  GoogleAuthProvider,
+} from "firebase/auth";
+import { initializeApp } from "firebase/app";
 import { getFirestore } from "firebase/firestore";
-
 
 const firebaseConfig = {
   apiKey: "AIzaSyAYkYX81_QyFwH471EdXTaK334xHZt2EZ8",
@@ -74,14 +16,41 @@ const firebaseConfig = {
   storageBucket: "task-manager-66724.firebasestorage.app",
   messagingSenderId: "147805093265",
   appId: "1:147805093265:web:4092bbfe8f79447666ee30",
-  measurementId: "G-DFMPLXY4ES"
+  measurementId: "G-DFMPLXY4ES",
 };
+
+
+interface UserProps {
+  uid: string;
+  email: string;
+  emailVerified: boolean;
+  displayName: string;
+  isAnonymous: boolean;
+  photoURL: string;
+  providerData: {
+    providerId: string;
+    uid: string;
+    displayName: string;
+    email: string;
+    phoneNumber: string | null;
+    photoURL: string;
+  }[];
+  stsTokenManager: {
+    refreshToken: string;
+    accessToken: string;
+    expirationTime: number;
+  };
+  createdAt: string;
+  lastLoginAt: string;
+  apiKey: string;
+  appName: string;
+}
+
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 export const db = getFirestore(app);
-
 
 interface AuthContextType {
   currentUser: any;
@@ -89,10 +58,14 @@ interface AuthContextType {
   signInWithGoogle: () => Promise<void>;
 }
 
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
+const AuthContext = createContext<AuthContextType | null>(null);
 
-export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [currentUser, setCurrentUser] = useState<any>(null);
+export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
+  children,
+}) => {
+  const [currentUser, setCurrentUser] = useState<UserProps | null>(
+    localStorage.getItem("User") ? JSON.parse(localStorage.getItem("User")!) : null
+  );
   const provider = new GoogleAuthProvider();
 
   useEffect(() => {
@@ -104,6 +77,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const logout = async () => {
     await signOut(auth);
+    setCurrentUser(null);
   };
 
   const signInWithGoogle = async () => {
@@ -111,11 +85,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const result = await signInWithPopup(auth, provider);
       const credential = GoogleAuthProvider.credentialFromResult(result);
       const token = credential?.accessToken;
-      const user = result.user;
+      const user: UserProps = result.user;
+      localStorage.setItem("User", JSON.stringify(user));
       setCurrentUser(user);
       console.log("Google Sign-In Success:", user);
     } catch (error: any) {
       console.error("Google Sign-In Error:", error.message);
+      setCurrentUser(null);
       throw error;
     }
   };
@@ -130,7 +106,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (!context) {
-    throw new Error('useAuth must be used within an AuthProvider');
+    throw new Error("useAuth must be used within an AuthProvider");
   }
   return context;
 };
+

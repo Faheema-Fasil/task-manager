@@ -1,5 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import TextEditor from "./Quill";
+import { Drawer } from "@mui/material"; // Import Material UI Drawer
+import useMediaQuery from "@mui/material/useMediaQuery"; // Media query detection
 
 interface Props {
   description: string;
@@ -23,141 +25,146 @@ const CreateTask: React.FC<CreateTaskProps & Props> = ({
   task,
   setTask,
 }) => {
+  const isMobile = useMediaQuery("(max-width: 768px)"); // Detect mobile screen size
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [category, setCategory] = useState<string>("WORK"); // Default category
+  const [status, setStatus] = useState<string>("TO-DO"); // Default status
+  const [dueDate, setDueDate] = useState<string>(""); // Store due date as string first
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0] || null;
-    setSelectedFile(file);
-  };
-
-  const handleUpdateClick = () => {
-    if (fileInputRef.current) {
-      fileInputRef.current.click(); // Programmatically trigger the file input dialog
-    }
-  };
-
   const handleSubmit = () => {
+    if (!task.trim()) {
+      alert("Task title is required!");
+      return;
+    }
+
     const taskData = {
       title: task,
-      description: description,
-      dueDate: new Date(), // Replace with actual due date from your form
-      category: "WORK", // Replace with actual category from your form
-      status: "TO-DO", // Replace with actual status from your form
+      description,
+      dueDate: dueDate ? new Date(dueDate) : new Date(), // Convert to Date
+      category,
+      status,
     };
+    
     onAddTask(taskData);
     console.log("Task added:", taskData);
     
+    setTask("");
   };
-  
 
-  if (!show) return null; // Hide modal when `show` is false
+  const taskForm = (
+    <div className="bg-white w-full md:w-200 px-2">
+      <div className="flex justify-between items-center border-gray-300 border-b p-3">
+        <h2 className="text-xl text-gray-600 p-2">Create Task</h2>
+        <button
+          onClick={onHide}
+          className="text-gray-500 mr-2 hover:text-red-600 transition text-lg duration-200"
+        >
+          ✖
+        </button>
+      </div>
 
-  return (
-    <div className="fixed inset-0 bg-black/50 flex justify-center text-sm items-center z-50">
-      <div className="bg-white rounded-3xl shadow-lg w-200">
-        {/* Modal Header */}
-        <div className="flex justify-between items-center border-gray-300 border-b p-3">
-          <h2 className="text-xl text-gray-600 p-2">Create Task</h2>
-          <button
-            onClick={onHide}
-            className="text-gray-500 mr-2 hover:text-red-600 transition text-lg duration-200"
-          >
-            ✖
-          </button>
-        </div>
+      <div className="p-2">
+        <input
+          className="w-full py-1 border border-gray-300 rounded-md p-2 text-sm"
+          placeholder="Task title"
+          type="text"
+          value={task}
+          onChange={(e) => setTask(e.target.value)}
+        />
 
-        {/* Modal Body */}
-        <div className="p-6 snap-y mb-25">
-          <input
-            className="w-full py-1 bg-gray-50 border border-gray-300 rounded-md p-2 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
-            placeholder="Task title"
-            type="text"
-            value={task}
-            onChange={(e) => setTask(e.target.value)}
-          />
-          <TextEditor />
+        <TextEditor />
 
-          {/* Task Category, Due Date, and Status */}
-          <div className="flex items-center gap-3 mt-2 justify-between border-gray-300">
-            <div className="font-sm w-4/12 flex flex-col gap-2 text-gray-600">
-              Task Category*
-              <div className="flex gap-2">
-                <button className="border border-gray-300 px-4 text-xs text-black py-1 rounded-full hover:bg-gray-200 transition duration-200">
-                  Work
-                </button>
-                <button className="border border-gray-300 px-4 text-xs text-black py-1 rounded-full hover:bg-gray-200 transition duration-200">
-                  Personal
-                </button>
-              </div>
-            </div>
-            <div className="font-sm w-4/12 flex flex-col gap-2 text-gray-600">
-              Due on*
-              <input
-                type="date"
-                className="border bg-gray-50 w-full border-gray-300 text-gray-400 px-2 py-1 rounded-lg text-sm hover:bg-gray-100"
-              />
-            </div>
-            <div className="font-sm w-4/12 flex flex-col gap-2 text-gray-600">
-              Task Status*
-              <select
-                className="border border-gray-300 text-gray-400 transition duration-200 w-full bg-gray-50 hover:bg-gray-100 text-sm text-black py-1 rounded-full"
-              >
-                <option value="" disabled selected hidden>
-                  Choose
-                </option>
-                <option value="TO-DO">To-Do</option>
-                <option value="IN-PROGRESS">In-Progress</option>
-                <option value="COMPLETED">Completed</option>
-              </select>
-            </div>
+        <div className="flex flex-col gap-3 mt-2">
+          <div className="flex flex-col w-2/3">
+            <label className="text-gray-600">Task Category*</label>
+            <select
+              value={category}
+              onChange={(e) => setCategory(e.target.value)}
+              className="border border-gray-300 p-1 rounded-md"
+            >
+              <option value="WORK">Work</option>
+              <option value="PERSONAL">Personal</option>
+            </select>
           </div>
 
-          {/* Attachment */}
-          <div>
-            <div className="font-xs w-4/12 flex flex-col gap-2 py-2 text-gray-400">Attachment</div>
-            <div className="border border-gray-300 rounded-md p-4 bg-gray-100 text-center relative">
-              <input
-                type="file"
-                ref={fileInputRef}
-                className="absolute opacity-0 pointer-events-none"
-                onChange={handleFileChange}
-              />
-              <p className="text-gray-600">
-                {selectedFile ? (
-                  <span>
-                    {selectedFile.name} ({selectedFile.size} bytes)
-                  </span>
-                ) : (
-                  <span>
-                    Drop your files here or{" "}
-                    <button onClick={handleUpdateClick} className="text-blue-500 hover:underline focus:outline-none">
-                      Update
-                    </button>
-                  </span>
-                )}
-              </p>
-            </div>
+          <div className="flex flex-col w-2/3">
+            <label className="text-gray-600">Due on*</label>
+            <input
+              type="date"
+              value={dueDate}
+              onChange={(e) => setDueDate(e.target.value)}
+              className="border border-gray-300 p-1 rounded-md"
+            />
+          </div>
+
+          <div className="flex flex-col w-2/3">
+            <label className="text-gray-600">Task Status*</label>
+            <select
+              value={status}
+              onChange={(e) => setStatus(e.target.value)}
+              className="border border-gray-300 p-1 rounded-md"
+            >
+              <option value="TO-DO">To-Do</option>
+              <option value="IN-PROGRESS">In-Progress</option>
+              <option value="COMPLETED">Completed</option>
+            </select>
           </div>
         </div>
 
-        {/* Modal Footer */}
-        <div className="mt-6 p-6 flex rounded-b-3xl border-t border-gray-400 bg-gray-200 justify-end gap-3">
-          <button
-            onClick={onHide}
-            className="px-4 py-2 rounded-full bg-gray-100 hover:bg-gray-400 text-gray-700 transition duration-150 ease-in-out focus:outline-none"
-          >
-            Close
-          </button>
-          <button
-            onClick={handleSubmit}
-            className="px-4 py-2 bg-[#7B1984]/50 rounded-full hover:bg-[#7B1984]/30 text-white transition duration-150 ease-in-out focus:outline-none"
-          >
-            <span className="flex items-center gap-2">Create</span>
-          </button>
+        <div className="mt-4">
+          <label className="text-gray-600">Attachment</label>
+          <div className="border border-gray-300 rounded-md p-4 text-center">
+            <input
+              type="file"
+              ref={fileInputRef}
+              className="hidden"
+              onChange={(e) => setSelectedFile(e.target.files?.[0] || null)}
+            />
+            <button
+              onClick={() => fileInputRef.current?.click()}
+              className="text-blue-500 hover:underline"
+            >
+              {selectedFile ? selectedFile.name : "Upload File"}
+            </button>
+          </div>
         </div>
       </div>
+
+      <div className="p-4 flex justify-end bg-gray-200 rounded-b-3xl">
+        <button
+          onClick={onHide}
+          className="px-4 py-2 bg-gray-100 rounded-full hover:bg-gray-400"
+        >
+          Close
+        </button>
+        <button
+          onClick={handleSubmit}
+          className="px-4 py-2 bg-purple-500 text-white rounded-full hover:bg-purple-700"
+        >
+          Create
+        </button>
+      </div>
     </div>
+  );
+
+  return (
+    <>
+      {!isMobile && show && (
+        <div className="fixed inset-0 bg-black/50 flex justify-center items-center z-50">
+          {taskForm}
+        </div>
+      )}
+
+      <Drawer
+        anchor="bottom"
+        open={isMobile && show}
+        onClose={onHide}
+        PaperProps={{ style: { borderRadius: "20px 20px 0 0", paddingBottom: "5px" } }}
+      >
+        {taskForm}
+      </Drawer>
+    </>
   );
 };
 

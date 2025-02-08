@@ -1,113 +1,63 @@
-import React from 'react';
-import { BsThreeDots } from 'react-icons/bs';
-// import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
+import React from "react";
+import { BsThreeDots } from "react-icons/bs";
+import noTasks from "../assets/Results not found.png";
 
-// interface Task {
-//   id: string;
-//   name: string;
-//   dueDate: string;
-//   status: 'TO-DO' | 'IN-PROGRESS' | 'COMPLETED';
-//   category: 'WORK' | 'PERSONAL';
-// }
+interface Task {
+  id: string;
+  title: string;
+  dueDate: any;
+  status: "TO-DO" | "IN-PROGRESS" | "COMPLETED";
+  category: "WORK" | "PERSONAL";
+  description: string;
+  createdAt: any;
+}
 
-// interface TaskBoardProps {
- 
-// }
+interface TaskBoardProps {
+  tasks: Task[];
+  setTasks: React.Dispatch<React.SetStateAction<Task[]>>;
+}
 
-const TaskBoard: React.FC = () => {
-
-
+const TaskBoard: React.FC<TaskBoardProps> = ({ tasks, setTasks }: TaskBoardProps) => {
+  const groupedTasks = {
+    "TO-DO": tasks.filter((task) => task.status === "TO-DO"),
+    "IN-PROGRESS": tasks.filter((task) => task.status === "IN-PROGRESS"),
+    "COMPLETED": tasks.filter((task) => task.status === "COMPLETED"),
+  };
 
   return (
-   <div className='mt-8'>
-    <div className='flex flex-row gap-4'>
-      <div className='w-1/4 border-none  rounded-lg p-4 min-h-100 bg-gray-100'>
-      
-        <span className='bg-[#FAC3FF] p-2  rounded text-xs'>TO-DO</span>
-{/* todooooo */}
+    <div className="mt-8">
+      <div className="flex flex-row gap-4">
+        {Object.entries(groupedTasks).map(([status, taskList]) => (
+          <div key={status} className="w-1/4 border-none rounded-lg p-4 min-h-100 bg-gray-100">
+            <span className="bg-[#FAC3FF] p-2 rounded text-xs">{status}</span>
 
-        <div className='bg-white flex flex-col gap-15 p-2 mt-5 rounded-2xl'>
-          <div className='flex items-center justify-between'>
-
-          <span className='text-sm font-semibold'>Interview with Design Team</span>
-          <BsThreeDots className='text-sm' />
-
+            {taskList.length > 0 ? (
+              taskList.map((task) => (
+                <div key={task.id} className="bg-white flex flex-col gap-2 p-2 mt-5 rounded-2xl">
+                  <div className="flex items-center justify-between">
+                    <span className={`text-sm font-semibold ${status === "COMPLETED" ? "line-through" : ""}`}>
+                      {task.title}
+                    </span>
+                    <BsThreeDots className="text-sm" />
+                  </div>
+                  <div className="flex items-center justify-between text-xs text-gray-400">
+                    <span>{task.category}</span>
+                    <span>{task.dueDate.toDate().toLocaleDateString()}</span>
+                  </div>
+                </div>
+              ))
+            ) : (
+              <div className="flex flex-col items-center mt-5">
+                <img src={noTasks} alt="no-tasks" className="w-40" />
+                <p className="text-gray-500 text-sm">No tasks</p>
+              </div>
+            )}
           </div>
-          <div className='flex items-center  justify-between'>
-
-          <span className='text-xs text-gray-400'>Work</span>
-          <span className='text-xs text-gray-400'>date</span>
-
-
-          </div>
-
-        </div>
+        ))}
       </div>
-
-
-
-
-      {/* inprogress */}
-      <div className='w-1/4 border-none  rounded-lg p-4 min-h-100 bg-gray-100'>
-      
-        <span className='bg-[#FAC3FF] p-2  rounded text-xs'>IN-PROGRESS</span>
-
-
-        <div className='bg-white flex flex-col gap-15 p-2 mt-5 rounded-2xl'>
-          <div className='flex items-center justify-between'>
-
-          <span className='text-sm font-semibold'>Interview with Design Team</span>
-          <BsThreeDots className='text-sm' />
-
-          </div>
-          <div className='flex items-center  justify-between'>
-
-          <span className='text-xs text-gray-400'>Work</span>
-          <span className='text-xs text-gray-400'>date</span>
-
-
-          </div>
-
-        </div>
-      </div>
-
-
-
-
-
-      {/* COMPLETED */}
-      <div className='w-1/4 border-none  rounded-lg p-4 min-h-100 bg-gray-100'>
-      
-        <span className='bg-[#FAC3FF] p-2  rounded text-xs'>COMPLETED</span>
-
-
-        <div className='bg-white flex flex-col gap-15 p-2 mt-5 rounded-2xl'>
-          <div className='flex items-center justify-between'>
-
-          <span className='text-sm font-semibold line-through'>Interview with Design Team</span>
-          <button>
-
-          <BsThreeDots className='text-sm' />
-          </button>
-
-          </div>
-          <div className='flex items-center  justify-between'>
-
-          <span className='text-xs text-gray-400'>Work</span>
-          <span className='text-xs text-gray-400'>date</span>
-
-
-          </div>
-
-        </div>
-      </div>
-
-
-
     </div>
-
-   </div>
   );
 };
 
 export default TaskBoard;
+

@@ -113,7 +113,7 @@ const TaskBuddy: React.FC = () => {
 
 const TaskList: React.FC<{ title: string; tasks: Task[] }> = ({ title, tasks }) => (
   <div className="mb-4">
-    <h2 className="text-lg font-semibold mb-2">{title} ({tasks.length})</h2>
+    <h2 className="text-lg  font-semibold mb-2">{title} ({tasks.length})</h2>
     {tasks.map((task, index) => (
       <div key={index} className="bg-white rounded shadow p-2 mb-2 flex items-center">
         <input type="checkbox" className="mr-2" /> {/* Add checkbox here */}
