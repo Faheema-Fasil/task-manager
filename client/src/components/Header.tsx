@@ -2,7 +2,7 @@ import React from "react";
 import { useAuth } from "../firebase.tsx";
 import { useNavigate } from "react-router-dom";
 import logoutIcon from "../assets/logout_icon.png";
-import todo from "../assets/task.png";
+import todo from "../assets/task_icon.png";
 
 const Header: React.FC = () => {
   const { logout, currentUser } = useAuth();

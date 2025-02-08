@@ -398,6 +398,8 @@ const ListBoardFilter: React.FC<ListBoardFilterProps> = ({
               <option className="text-gray-500" selected disabled>
                 Category
               </option>
+            <option value="All">All</option>
+            
               {categories.map((category) => (
                 <option
                   key={category}

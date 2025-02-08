@@ -5,7 +5,7 @@ import calenderimg from "../assets/calender_icon.svg";
 import { FiPlus } from "react-icons/fi";
 import union from "../assets/Union.png";
 import dragicon from "../assets/drag_icon.png";
-import { MdCheckCircle } from "react-icons/md";
+import { MdCheckCircle, MdDelete } from "react-icons/md";
 import Inprogress from "../components/Inprogress";
 import { BsThreeDots } from "react-icons/bs";
 import Completed from "./Completed";
@@ -13,6 +13,7 @@ import UpdateTask from "./UpdateTask";
 import { Timestamp } from "firebase/firestore";
 import TaskListComponent from "./TaskComponent";
 import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
+import { CiEdit } from "react-icons/ci";
 
 type Task = {
   id: string;
@@ -59,6 +60,7 @@ const TaskList = ({
     newStatus: "TO-DO" | "IN-PROGRESS" | "COMPLETED"
   ) => {
     const task = tasks.find((task) => task.id === taskId);
+    console.log("taskStatus", task)
     if (task) {
       try {
         await editTask({
@@ -158,7 +160,7 @@ const TaskList = ({
   };
 
 
-  const todoTasks = filteredTasks.filter((task) => task.status === "TO-DO");
+  const todoTasks: any = filteredTasks.filter((task: any) => task.status === "TO-DO");
 
   return (
     <div className="w-full">
@@ -166,21 +168,29 @@ const TaskList = ({
       <TaskTableHeader />
 
       <div className="flex justify-between items-center bg-[#FAC3FF] p-3 rounded-t-2xl">
-        <h6 className="font-xs font-semibold">Todo ({tasks.length})</h6>
+        <h6 className="font-xs font-semibold">Todo ({todoTasks.length})</h6>
         <button onClick={() => setOpenToDo(!openToDo)}>
           {openToDo ? <IoIosArrowDown /> : <IoIosArrowUp />}
         </button>
       </div>
+      {/* <div className="flex items-center bg-gray-100 border-b border-gray-300 p-3">
+        <button onClick={() => setIsAddingTask(true)} className="flex items-center hover:border-gray-400" type="button">
+        <span className="text-purple-600 text-3xl mr-2">+</span> 
+        <span className="text-black text-xl">Add Task</span>
 
+        </button>
+        </div> */}
       <div className=" ">
 
         {openToDo && (
           <DragDropContext onDragEnd={onDragEnd}>
             <Droppable droppableId="tasks">
               {(provided) => (
-                <div ref={provided.innerRef} {...provided.droppableProps} className="bg-gray-100 rounded-b-2xl shadow-md">
-                  {tasks.map((task, index) => (
+                <div ref={provided.innerRef} {...provided.droppableProps} className="bg-gray-100 min-h-35 rounded-b-2xl shadow-md">
+                  {todoTasks.map((task: any, index: any) => (
+                    
                     <Draggable key={task.id} draggableId={task.id} index={index}>
+                      
                       {(provided) => (
                         <div
                           ref={provided.innerRef}
@@ -230,11 +240,11 @@ const TaskList = ({
                             </button>
                             {menuOpenTaskId === task.id && (
                               <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded shadow-lg">
-                                <button onClick={() => editTask(task.id)} className="block px-4 py-2 text-sm hover:bg-gray-100 w-full text-left">
-                                  Edit
+                                <button onClick={() => editTask(task.id)} className="block flex items-center gap-2 px-4 py-2 text-sm hover:bg-gray-100 w-full text-left">
+                                 <CiEdit/> <span>Edit</span>
                                 </button>
-                                <button onClick={() => deleteTask(task.id)} className="block px-4 py-2 text-sm hover:bg-gray-100 w-full text-left">
-                                  Delete
+                                <button onClick={() => deleteTask(task.id)} className="block flex items-center gap-2 px-4 py-2 text-sm hover:bg-gray-100 w-full text-left">
+                                 <MdDelete className="text-red-500"/> <span className="text-red-500">Delete</span>
                                 </button>
                               </div>
                             )}
@@ -259,6 +269,7 @@ const TaskList = ({
           updateTaskStatus={updateTaskStatus}
           menuOpenTaskId={menuOpenTaskId}
           setMenuOpenTaskId={setMenuOpenTaskId}
+          handleStatusChange={handleStatusChange}
           deleteTask={deleteTask}
           handleEdit={handleEdit}
           setTasks={setTasks}
@@ -273,6 +284,7 @@ const TaskList = ({
           updateTaskStatus={updateTaskStatus}
           menuOpenTaskId={menuOpenTaskId}
           setMenuOpenTaskId={setMenuOpenTaskId}
+          handleStatusChange={handleStatusChange}
           deleteTask={deleteTask}
           handleEdit={handleEdit}
           setTasks={setTasks}
