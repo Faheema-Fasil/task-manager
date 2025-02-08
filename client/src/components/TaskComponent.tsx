@@ -30,10 +30,11 @@ interface TaskListComponentProps {
   updateTaskStatus: (id: string, status: Task["status"]) => void;
   menuOpenTaskId: string | null;
   setMenuOpenTaskId: React.Dispatch<React.SetStateAction<string | null>>;
-  handleStatusChange: any;
+  handleStatusChange: (taskId: string, newStatus: Task["status"]) => void;
   deleteTask: (id: string) => void;
   handleEdit: (id: string) => void;
   editTask: (task: Partial<Task>) => Promise<void>;
+  
 }
 
 const TaskListComponent: React.FC<TaskListComponentProps> = ({
@@ -48,27 +49,86 @@ const TaskListComponent: React.FC<TaskListComponentProps> = ({
   deleteTask,
   handleEdit,
   editTask,
+ 
 }) => {
+
   const [isOpen, setIsOpen] = useState(true);
+  const [selectedTasks, setSelectedTasks] = useState<string[]>([]);
+  const [showBulkActions, setShowBulkActions] = useState(false);
   const [statusDropdownTaskId, setStatusDropdownTaskId] = useState<string | null>(null);
+  const [bulkStatusDropdown, setBulkStatusDropdown] = useState(false);
   const filteredTasks = tasks.filter((task) => task.status === status);
 
   const toggleStatusDropdown = (taskId: string) => {
     setStatusDropdownTaskId(statusDropdownTaskId === taskId ? null : taskId);
   };
 
+  const toggleTaskSelection = (taskId: string) => {
+    let updatedSelection = [...selectedTasks];
+    if (updatedSelection.includes(taskId)) {
+      updatedSelection = updatedSelection.filter((id) => id !== taskId);
+    } else {
+      updatedSelection.push(taskId);
+    }
+    setSelectedTasks(updatedSelection);
+    setShowBulkActions(updatedSelection.length >= 2);
+  };
+
+  const bulkDelete = () => {
+    const updatedTasks = tasks.filter((task) => !selectedTasks.includes(task.id));
+    setTasks(updatedTasks);
+    setSelectedTasks([]);
+    setShowBulkActions(false);
+  };
+
+  const bulkChangeStatus = (newStatus: Task["status"]) => {
+    const updatedTasks = tasks.map((task) =>
+      selectedTasks.includes(task.id) ? { ...task, status: newStatus } : task
+    );
+    setTasks(updatedTasks);
+    setSelectedTasks([]);
+    setShowBulkActions(false);
+  };
+
   const onDragEnd = (result: any) => {
     if (!result.destination) return;
-    const reorderedTasks = Array.from(filteredTasks);
-    const [movedTask] = reorderedTasks.splice(result.source.index, 1);
-    reorderedTasks.splice(result.destination.index, 0, movedTask);
-    setTasks((prev) => {
-      const updatedTasks = prev.map((task) =>
-        reorderedTasks.find((t) => t.id === task.id) || task
-      );
-      return updatedTasks;
-    });
+  
+    const { source, destination, draggableId } = result;
+  
+    // Clone the tasks array
+    let updatedTasks = [...tasks];
+  
+    // Find the dragged task index
+    const draggedTaskIndex = updatedTasks.findIndex((task) => task.id === draggableId);
+    if (draggedTaskIndex === -1) return; // Exit if task not found
+  
+    // Extract the dragged task
+    const [draggedTask] = updatedTasks.splice(draggedTaskIndex, 1);
+  
+    // Update status if moved across lists
+    if (source.droppableId !== destination.droppableId) {
+      draggedTask.status = destination.droppableId as "TO-DO" | "IN-PROGRESS" | "COMPLETED";
+    }
+  
+    // Filter tasks for the destination list
+    const destinationTasks = updatedTasks.filter((task) => task.status === destination.droppableId);
+  
+    // Insert task at correct position in the filtered list
+    destinationTasks.splice(destination.index, 0, draggedTask);
+  
+    // Rebuild the final task list with updated ordering
+    updatedTasks = [
+      ...updatedTasks.filter((task) => task.status !== destination.droppableId),
+      ...destinationTasks,
+    ];
+  
+    setTasks(updatedTasks);
   };
+  
+  
+  
+  
+  
 
   return (
     <div className="w-full">
@@ -80,10 +140,32 @@ const TaskListComponent: React.FC<TaskListComponentProps> = ({
           {isOpen ? <IoIosArrowDown /> : <IoIosArrowUp />}
         </button>
       </div>
+
+      {showBulkActions && (
+        <div className="flex justify-between p-2 bg-gray-200 text-sm">
+          <button onClick={() => setBulkStatusDropdown(!bulkStatusDropdown)} className="px-2 py-1 bg-blue-500 text-white rounded">
+            Change Status
+          </button>
+          <button onClick={bulkDelete} className="px-2 py-1 bg-red-500 text-white rounded">
+            Delete Selected
+          </button>
+          {bulkStatusDropdown && (
+            <div className="absolute bg-white mt-5 ml-28 border shadow-md z-10 p-2 rounded">
+              {["TO-DO", "IN-PROGRESS", "COMPLETED"].map((status) => (
+                <button key={status} onClick={() => bulkChangeStatus(status as Task["status"])} className="block w-full text-left px-4 py-2 hover:bg-gray-100">
+                  {status}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+
       {isOpen && (
         <div className="bg-gray-100 min-h-35 rounded-b-2xl shadow-md">
           <DragDropContext onDragEnd={onDragEnd}>
-            <Droppable droppableId="taskList">
+          <Droppable droppableId={status}>
+            
               {(provided) => (
                 <div {...provided.droppableProps} ref={provided.innerRef}>
                   {filteredTasks.map((task, index) => (
@@ -96,6 +178,12 @@ const TaskListComponent: React.FC<TaskListComponentProps> = ({
                           className="flex items-center justify-between p-3 border-b border-gray-300 hover:bg-gray-50 transition"
                         >
                           <div className="flex items-center gap-1 w-5/12">
+                          <input
+                            type="checkbox"
+                            checked={selectedTasks.includes(task.id)}
+                            onChange={() => toggleTaskSelection(task.id)}
+                            className="mr-2"
+                          />
                             <button>
                               <img src={dragicon} alt="Drag Icon" />
                             </button>
@@ -108,10 +196,7 @@ const TaskListComponent: React.FC<TaskListComponentProps> = ({
                             {new Date(task.dueDate.seconds * 1000).toLocaleDateString()}
                           </div>
                           <div className="w-2/12 hidden md:flex items-center relative">
-                            <button
-                              onClick={() => toggleStatusDropdown(task.id)}
-                              className="bg-gray-200 text-gray-600 px-2 py-1 rounded text-xs mr-2"
-                            >
+                            <button onClick={() => toggleStatusDropdown(task.id)} className="bg-gray-200 text-gray-600 px-2 py-1 rounded text-xs mr-2">
                               {task.status}
                             </button>
                             {statusDropdownTaskId === task.id && (
@@ -129,9 +214,7 @@ const TaskListComponent: React.FC<TaskListComponentProps> = ({
                             )}
                           </div>
                           <div className="w-2/12 flex items-center">
-                            <span className="px-2 py-1 hidden md:flex rounded text-xs">
-                              {task.category}
-                            </span>
+                            <span className="px-2 py-1 hidden md:flex rounded text-xs">{task.category}</span>
                           </div>
                           <div className="relative">
                             <button onClick={() => setMenuOpenTaskId(task.id === menuOpenTaskId ? null : task.id)}>

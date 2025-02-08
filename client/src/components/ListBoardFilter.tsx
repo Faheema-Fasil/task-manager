@@ -333,7 +333,7 @@ const ListBoardFilter: React.FC<ListBoardFilterProps> = ({
         </button>
       </div>
       <div className="flex items-center justify-between mb-4">
-        <div className="md:hidden flex flex-col items-center">
+        <div className="hidden flex flex-col items-center">
           <button
             className="w-full text-gray-600 flex items-center justify-center border-b-2 hover:border-b-2 py-2"
             onClick={() => setOpenList(true)}

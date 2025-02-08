@@ -6,9 +6,9 @@ import { FiPlus } from "react-icons/fi";
 import union from "../assets/Union.png";
 import dragicon from "../assets/drag_icon.png";
 import { MdCheckCircle, MdDelete } from "react-icons/md";
-import Inprogress from "../components/Inprogress";
+
 import { BsThreeDots } from "react-icons/bs";
-import Completed from "./Completed";
+
 import UpdateTask from "./UpdateTask";
 import { Timestamp } from "firebase/firestore";
 import TaskListComponent from "./TaskComponent";
@@ -46,10 +46,16 @@ const TaskList = ({
   });
   const [menuOpenTaskId, setMenuOpenTaskId] = useState<string | null>(null);
   const [showUpdateTask, setShowUpdateTask] = useState(false);
+  const [selectedTasks, setSelectedTasks] = useState<string[]>([]);
+    const [showBulkActions, setShowBulkActions] = useState(false);
+
+    const [bulkStatusDropdown, setBulkStatusDropdown] = useState(false);
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   const [statusDropdownTaskId, setStatusDropdownTaskId] = useState<
     string | null
   >(null);
+
+  
 
   const toggleStatusDropdown = (taskId: string) => {
     setStatusDropdownTaskId(statusDropdownTaskId === taskId ? null : taskId);
@@ -97,7 +103,7 @@ const TaskList = ({
   };
 
   const addTask = () => {
-    if (!newTask.title || !newTask.due) return;
+    if (!newTask.title || !newTask.dueDate) return;
     setTasks([
       ...tasks,
       {
@@ -107,7 +113,7 @@ const TaskList = ({
         id: (tasks.length + 1).toString(),
       },
     ]);
-    setNewTask({ title: "", due: Timestamp.now() });
+    setNewTask({ title: "", dueDate: Timestamp.now() });
     setIsAddingTask(false);
   };
 
@@ -148,17 +154,71 @@ const TaskList = ({
     );
     setShowUpdateTask(false);
   };
-
-  const onDragEnd = (result) => {
-    if (!result.destination) return;
-
-    const reorderedTasks = Array.from(tasks);
-    const [movedTask] = reorderedTasks.splice(result.source.index, 1);
-    reorderedTasks.splice(result.destination.index, 0, movedTask);
-
-    setTasks(reorderedTasks);
+  const toggleTaskSelection = (taskId: string) => {
+    let updatedSelection = [...selectedTasks];
+    if (updatedSelection.includes(taskId)) {
+      updatedSelection = updatedSelection.filter((id) => id !== taskId);
+    } else {
+      updatedSelection.push(taskId);
+    }
+    setSelectedTasks(updatedSelection);
+    
+    setShowBulkActions(updatedSelection.length >= 2);
   };
 
+  const bulkDelete = () => {
+    const updatedTasks = tasks.filter((task) => !selectedTasks.includes(task.id));
+    setTasks(updatedTasks);
+    setSelectedTasks([]);
+    setShowBulkActions(false);
+  };
+
+  const bulkChangeStatus = (newStatus: Task["status"]) => {
+    const updatedTasks = tasks.map((task) =>
+      selectedTasks.includes(task.id) ? { ...task, status: newStatus } : task
+    );
+    setTasks(updatedTasks);
+    setSelectedTasks([]);
+    setShowBulkActions(false);
+  };
+  const onDragEnd = (result: any) => {
+    if (!result.destination) return;
+  
+    const { source, destination, draggableId } = result;
+  
+    // Clone the tasks array
+    let updatedTasks = [...tasks];
+  
+    // Find the dragged task index
+    const draggedTaskIndex = updatedTasks.findIndex((task) => task.id === draggableId);
+    if (draggedTaskIndex === -1) return; // Exit if task not found
+  
+    // Extract the dragged task
+    const [draggedTask] = updatedTasks.splice(draggedTaskIndex, 1);
+  
+    // Update status if moved across lists
+    if (source.droppableId !== destination.droppableId) {
+      draggedTask.status = destination.droppableId as "TO-DO" | "IN-PROGRESS" | "COMPLETED";
+    }
+  
+    // Filter tasks for the destination list
+    const destinationTasks = updatedTasks.filter((task) => task.status === destination.droppableId);
+  
+    // Insert task at correct position in the filtered list
+    destinationTasks.splice(destination.index, 0, draggedTask);
+  
+    // Rebuild the final task list with updated ordering
+    updatedTasks = [
+      ...updatedTasks.filter((task) => task.status !== destination.droppableId),
+      ...destinationTasks,
+    ];
+  
+    setTasks(updatedTasks);
+  };
+  
+  
+  
+  
 
   const todoTasks: any = filteredTasks.filter((task: any) => task.status === "TO-DO");
 
@@ -173,6 +233,25 @@ const TaskList = ({
           {openToDo ? <IoIosArrowDown /> : <IoIosArrowUp />}
         </button>
       </div>
+      {showBulkActions && (
+        <div className="flex justify-between p-2 bg-gray-200 text-sm">
+          <button onClick={() => setBulkStatusDropdown(!bulkStatusDropdown)} className="px-2 py-1 bg-blue-500 text-white rounded">
+            Change Status
+          </button>
+          <button onClick={bulkDelete} className="px-2 py-1 bg-red-500 text-white rounded">
+            Delete Selected
+          </button>
+          {bulkStatusDropdown && (
+            <div className="absolute bg-white border shadow-md mt-5 ml-28 p-2 rounded">
+              {["TO-DO", "IN-PROGRESS", "COMPLETED"].map((status) => (
+                <button key={status} onClick={() => bulkChangeStatus(status as Task["status"])} className="block w-full text-left px-4 py-2 hover:bg-gray-100">
+                  {status}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
       {/* <div className="flex items-center bg-gray-100 border-b border-gray-300 p-3">
         <button onClick={() => setIsAddingTask(true)} className="flex items-center hover:border-gray-400" type="button">
         <span className="text-purple-600 text-3xl mr-2">+</span> 
@@ -184,7 +263,7 @@ const TaskList = ({
 
         {openToDo && (
           <DragDropContext onDragEnd={onDragEnd}>
-            <Droppable droppableId="tasks">
+            <Droppable droppableId="TO-DO">
               {(provided) => (
                 <div ref={provided.innerRef} {...provided.droppableProps} className="bg-gray-100 min-h-35 rounded-b-2xl shadow-md">
                   {todoTasks.map((task: any, index: any) => (
@@ -196,10 +275,12 @@ const TaskList = ({
                           ref={provided.innerRef}
                           {...provided.draggableProps}
                           {...provided.dragHandleProps}
-                          className="flex items-center justify-between p-3 border-b border-gray-300 hover:bg-gray-50 transition"
+                          className="task-item flex items-center justify-between p-3 border-b border-gray-300 hover:bg-gray-50 transition"
                         >
                           <div className="flex items-center gap-1 w-5/12">
-                            <input type="checkbox" className="" />
+                            <input type="checkbox" checked={selectedTasks.includes(task.id)}
+                            onChange={() => toggleTaskSelection(task.id)}
+                            className="mr-2" />
                             <div className="w-100 flex items-center">
                               <button>
                                 <img src={dragicon} alt="Drag Icon" />
@@ -274,6 +355,7 @@ const TaskList = ({
           handleEdit={handleEdit}
           setTasks={setTasks}
           editTask={editTask}
+          
         />
       </div>
       <div className="mt-4">
@@ -289,6 +371,7 @@ const TaskList = ({
           handleEdit={handleEdit}
           setTasks={setTasks}
           editTask={editTask}
+          
         />
       </div>
 
