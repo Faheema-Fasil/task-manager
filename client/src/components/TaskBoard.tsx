@@ -28,62 +28,30 @@ const TaskBoard: React.FC<TaskBoardProps> = ({ tasks, setTasks, editTask, delete
   };
 
   /**
-   * Handles drag and drop of tasks within the same column.
-   * @param {object} result - The result of the drag and drop operation.
+   * @param {object} result 
    * @return {void}
    */
-  // const onDragEnd = (result: any) => {
-  //   if (!result.destination) return;
-
-  //   const { source, destination } = result;
-  //   const updatedTasks = [...tasks];
-
-  //   // Find the dragged task
-  //   const movedTask = updatedTasks.find((task) => task.id === result.draggableId);
-  //   if (!movedTask) return;
-
-  //   // Remove the task from the source position
-  //   updatedTasks.splice(source.index, 1);
-
-  //   // Insert the task at the new position
-  //   updatedTasks.splice(destination.index, 0, movedTask);
-
-  //   // Update the status if moved to a new column
-  //   if (source.droppableId !== destination.droppableId) {
-  //     movedTask.status = destination.droppableId as "TO-DO" | "IN-PROGRESS" | "COMPLETED";
-  //   }
-
-  //   // Set the new state
-  //   setTasks(updatedTasks);
-  // };
 
   const onDragEnd = (result: any) => {
     if (!result.destination) return;
 
     const { source, destination, draggableId } = result;
 
-    // Clone the tasks array
     let updatedTasks = [...tasks];
 
-    // Find the dragged task index
     const draggedTaskIndex = updatedTasks.findIndex((task) => task.id === draggableId);
     if (draggedTaskIndex === -1) return; // Exit if task not found
 
-    // Extract the dragged task
     const [draggedTask] = updatedTasks.splice(draggedTaskIndex, 1);
 
-    // Update status if moved across lists
     if (source.droppableId !== destination.droppableId) {
       draggedTask.status = destination.droppableId as "TO-DO" | "IN-PROGRESS" | "COMPLETED";
     }
 
-    // Filter tasks for the destination list
     const destinationTasks = updatedTasks.filter((task) => task.status === destination.droppableId);
 
-    // Insert task at correct position in the filtered list
     destinationTasks.splice(destination.index, 0, draggedTask);
 
-    // Rebuild the final task list with updated ordering
     updatedTasks = [
       ...updatedTasks.filter((task) => task.status !== destination.droppableId),
       ...destinationTasks,
