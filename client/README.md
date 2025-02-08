@@ -1,50 +1,57 @@
-# React + TypeScript + Vite
+Task Management Application
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A fully responsive task management application built with React, Firebase, and Drag-and-Drop functionality, enabling users to efficiently manage their tasks with seamless authentication, categorization, and prioritization.
 
-Currently, two official plugins are available:
+ Live Demo
+ Live Application
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+ Features
+       User Authentication – Google Sign-In using Firebase Authentication.
+       Task Management – Create, edit, delete, and categorize tasks (To-Do, In Progress, Completed).
+       Drag-and-Drop Functionality – Rearrange tasks seamlessly across different statuses.
+       Sorting & Filtering – Organize tasks by due date and category.
+       Multiple Views – List and board views for better task visualization.
+       Responsive UI – Fully optimized for mobile, tablet, and desktop devices.
 
-## Expanding the ESLint configuration
+ Tech Stack
+  
+  Frontend
+         1. React (TypeScript)
+         2. React Router (Navigation)
+         3. MUI, Bootstrap, MDB React UI Kit, Tailwind CSS, Emotion (UI Components)
+         4. React DND 
+        
+  Backend & Database
+        1. Firebase Firestore (Real-time Database)
+        2. Firebase Authentication (Google Sign-In)
+        3. Development & Build Tools
+        4. Vite (Fast Development Build)
+        5. TypeScript (Strong Typing)
+        
+ Installation & Setup
+ 
+  Follow these steps to run the project locally:
+  
+    1. Clone the Repository
+        git clone https://github.com/Faheema-Fasil/task-manager.git
+        cd task-manager
+    
+    2. Install Dependencies
+        npm install
+    
+    3. Run the Development Server
+         npm run dev
+       
+    4. Build the Application for Deployment
+        npm run build
 
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
-
-- Configure the top-level `parserOptions` property like this:
-
-```js
-export default tseslint.config({
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
-```
-
-- Replace `tseslint.configs.recommended` to `tseslint.configs.recommendedTypeChecked` or `tseslint.configs.strictTypeChecked`
-- Optionally add `...tseslint.configs.stylisticTypeChecked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and update the config:
-
-```js
-// eslint.config.js
-import react from 'eslint-plugin-react'
-
-export default tseslint.config({
-  // Set the react version
-  settings: { react: { version: '18.3' } },
-  plugins: {
-    // Add the react plugin
-    react,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended rules
-    ...react.configs.recommended.rules,
-    ...react.configs['jsx-runtime'].rules,
-  },
-})
-```
+ Challenges Faced & Solutions
+        1. Task Rearrangement Bug
+            Issue: When dragging a task, it was being placed at the wrong position.
+            Solution: Fixed by properly filtering and reordering the tasks array before updating the state.
+        2. Task Multiplication on Drop
+            Issue: Tasks were duplicating when dropped into a new status category.
+            Solution: Ensured tasks were removed from the source list before inserting them into the destination list.
+        3. Firebase Firestore Synchronization
+            Issue: Reordered tasks were not updating in Firebase.
+            Solution: Implemented batch updates to reflect changes in the database instantly.
