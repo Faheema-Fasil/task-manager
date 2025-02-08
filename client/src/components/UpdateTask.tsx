@@ -49,6 +49,10 @@ const UpdateTask: React.FC<UpdateTaskProps> = ({
     });
   };
 
+  const handleDescriptionChange = (value: string) => {
+    setUpdatedTask({ ...updatedTask, description: value });
+  };
+
   const handleCategoryChange = (category: "WORK" | "PERSONAL") => {
     setUpdatedTask({ ...updatedTask, category });
   };
@@ -94,11 +98,8 @@ const UpdateTask: React.FC<UpdateTaskProps> = ({
                 />
 
                 <TextEditor
-                  className="w-full mt-2 border border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-purple-500"
                   value={updatedTask.description}
-                  name="description"
-                  onChange={handleInputChange}
-                  placeholder="Enter task description..."
+                  onChange={handleDescriptionChange}
                 />
 
                 <div className="flex items-center gap-3 mt-2 justify-between border-gray-300">

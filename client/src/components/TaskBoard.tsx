@@ -1,6 +1,6 @@
 import React from "react";
 import { BsThreeDots } from "react-icons/bs";
-import noTasks from "../assets/Results not found.png";
+
 
 interface Task {
   id: string;
@@ -48,7 +48,7 @@ const TaskBoard: React.FC<TaskBoardProps> = ({ tasks, setTasks }: TaskBoardProps
               ))
             ) : (
               <div className="flex flex-col items-center mt-5">
-                <img src={noTasks} alt="no-tasks" className="w-40" />
+
                 <p className="text-gray-500 text-sm">No tasks</p>
               </div>
             )}

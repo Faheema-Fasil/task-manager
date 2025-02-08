@@ -12,6 +12,17 @@ import Completed from "./Completed";
 import UpdateTask from "./UpdateTask";
 import { Timestamp } from "firebase/firestore";
 import TaskListComponent from "./TaskComponent";
+import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
+
+type Task = {
+  id: string;
+  title: string;
+  description: string;
+  dueDate: Timestamp;
+  status: "TO-DO" | "IN-PROGRESS" | "COMPLETED";
+  category: string;
+  createdAt: Timestamp;
+};
 
 const TaskList = ({
   tasks,
@@ -23,8 +34,8 @@ const TaskList = ({
   tasks: Task[];
   filteredTasks: any;
   setTasks: any;
-  editTask:any;
-  deleteTask:any;
+  editTask: any;
+  deleteTask: any;
 }) => {
   const [isAddingTask, setIsAddingTask] = useState(false);
   const [openToDo, setOpenToDo] = useState(true);
@@ -136,26 +147,16 @@ const TaskList = ({
     setShowUpdateTask(false);
   };
 
-  const onDragEnd = (result: any) => {
-    const { destination, source } = result;
+  const onDragEnd = (result) => {
+    if (!result.destination) return;
 
-    if (!destination) {
-      return;
-    }
+    const reorderedTasks = Array.from(tasks);
+    const [movedTask] = reorderedTasks.splice(result.source.index, 1);
+    reorderedTasks.splice(result.destination.index, 0, movedTask);
 
-    if (
-      destination.droppableId === source.droppableId &&
-      destination.index === source.index
-    ) {
-      return;
-    }
-
-    const newTasks = Array.from(tasks);
-    const [removed] = newTasks.splice(source.index, 1);
-    newTasks.splice(destination.index, 0, removed);
-
-    setTasks(newTasks);
+    setTasks(reorderedTasks);
   };
+
 
   const todoTasks = filteredTasks.filter((task) => task.status === "TO-DO");
 
@@ -172,174 +173,81 @@ const TaskList = ({
       </div>
 
       <div className=" ">
+
         {openToDo && (
-          <div className="bg-gray-100 rounded-b-2xl shadow-md">
-            <div className="md:flex hidden justify-between items-center p-2 border-b border-gray-300">
-              <button
-                onClick={() => setIsAddingTask(true)}
-                className="rounded px-4 py-2 text-sm"
-              >
-                <span className="text-purple">+</span> ADD TASK
-              </button>
-            </div>
-
-            {isAddingTask && (
-              <div className="mb-4 p-4 bg-gray-50 rounded relative md:flex hidden">
-                <div className="flex items-center px-8 mr-50 justify-between mx-5">
-                  <input
-                    type="text"
-                    name="title"
-                    placeholder="Task Title"
-                    value={newTask.title}
-                    onChange={handleInputChange}
-                    className="border-none text-sm rounded mb-2"
-                  />
-                  <button
-                    type="button"
-                    className="border border-gray-300 rounded-full p-2 flex items-center gap-1 hover:bg-gray-100 transition"
-                    onClick={handleDateClick}
-                    aria-label="Add Due Date"
-                  >
-                    <img
-                      src={calenderimg}
-                      alt="Calendar Icon"
-                      className="w-5 h-5"
-                    />
-                    <span className="text-xs">Add Date</span>
-                  </button>
-                  <div>
-                    <button className="border border-gray-300 rounded-full text-sm p-1">
-                      <FiPlus />
-                    </button>
-                    <div className="flex bg-white absolute border border-gray-300 rounded-2xl p-2 text-sm items-start justify-items-start flex-col">
-                      <button className="w-full text-start flex text-xs mb-1 items-start justify-items-start hover:border-b border-gray-300">
-                        TO-DO
-                      </button>
-                      <button className="w-full text-start flex text-xs mb-1 items-start justify-items-start hover:border-b border-gray-300">
-                        IN-PROGRESS
-                      </button>
-                      <button className="w-full text-start flex text-xs mb-1 items-start justify-items-start hover:border-b border-gray-300">
-                        COMPLETED
-                      </button>
-                    </div>
-                  </div>
-                  <div>
-                    <button className="border border-gray-300 rounded-full text-sm p-1">
-                      <FiPlus />
-                    </button>
-                    <div className="flex bg-white absolute border border-gray-300 rounded-2xl p-2 text-sm items-start justify-items-start flex-col">
-                      <button className="w-text-start flex text-xs mb-1 items-start justify-items-start hover:border-b border-gray-300">
-                        WORK
-                      </button>
-                      <button className="w-text-start flex text-xs mb-1 items-start justify-items-start hover:border-b border-gray-300">
-                        PERSONAL
-                      </button>
-                    </div>
-                  </div>
-                </div>
-                <div className="flex mt-2 mx-13">
-                  <button
-                    onClick={addTask}
-                    className="bg-[#7B1984] flex items-center gap-2 text-white px-3 rounded-full"
-                    disabled={!newTask.title || !newTask.due}
-                  >
-                    <span className="text-xs">ADD </span>{" "}
-                    <img src={union} alt="" />
-                  </button>
-                  <button
-                    onClick={() => setIsAddingTask(false)}
-                    className="rounded px-4 py-2"
-                  >
-                    CANCEL
-                  </button>
-                </div>
-              </div>
-            )}
-
-            {todoTasks &&
-              todoTasks.map((task) => (
-                <div
-                  key={task.id}
-                  className="flex items-center justify-between p-3 border-b border-gray-300 hover:bg-gray-50 transition"
-                >
-                  <div className="flex items-center gap-1 w-5/12">
-                    <input type="checkbox" className="" />
-                    <div className="w-100 flex items-center">
-                      <button>
-                        <img src={dragicon} alt="Drag Icon" />
-                      </button>
-                      <span className="mr-2">
-                        <MdCheckCircle />
-                      </span>
-                      <p className="flex-1">{task.title}</p>
-                    </div>
-                  </div>
-                  <div className="w-3/12  hidden md:flex text-gray-500">
-                    {new Date(task.dueDate.seconds * 1000).toLocaleDateString()}
-                  </div>
-                  <div className="w-2/12 hidden md:flex items-center relative">
-                    <button
-                      onClick={() => toggleStatusDropdown(task.id)}
-                      className="bg-gray-200 text-gray-600 px-2 py-1 rounded text-xs mr-2"
-                    >
-                      {task.status}
-                    </button>
-
-                    {statusDropdownTaskId === task.id && (
-                      <div className="absolute left-0 top-8 bg-white border  border-gray-300 rounded shadow-md z-10">
-                        {["TO-DO", "IN-PROGRESS", "COMPLETED"].map((status) => (
-                          <button
-                            key={status}
-                            className="block w-full px-4 py-2 text-left text-sm hover:bg-gray-100"
-                            onClick={() =>
-                              handleStatusChange(
-                                task.id,
-                                status as "TO-DO" | "IN-PROGRESS" | "COMPLETED"
-                              )
-                            }
-                          >
-                            {status}
-                          </button>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-
-                  <div className="w-2/12 flex items-center">
-                    <span className="px-2 py-1  hidden md:flex rounded text-xs">
-                      {task.category}
-                    </span>
-                  </div>
-                  <div className="relative">
-                    <button
-                      onClick={() =>
-                        setMenuOpenTaskId(
-                          task.id === menuOpenTaskId ? null : task.id
-                        )
-                      }
-                    >
-                      <BsThreeDots />
-                    </button>
-                    {menuOpenTaskId === task.id && (
-                      <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded shadow-lg">
-                        <button
-                          onClick={() => handleEdit(task.id)}
-                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left"
+          <DragDropContext onDragEnd={onDragEnd}>
+            <Droppable droppableId="tasks">
+              {(provided) => (
+                <div ref={provided.innerRef} {...provided.droppableProps} className="bg-gray-100 rounded-b-2xl shadow-md">
+                  {tasks.map((task, index) => (
+                    <Draggable key={task.id} draggableId={task.id} index={index}>
+                      {(provided) => (
+                        <div
+                          ref={provided.innerRef}
+                          {...provided.draggableProps}
+                          {...provided.dragHandleProps}
+                          className="flex items-center justify-between p-3 border-b border-gray-300 hover:bg-gray-50 transition"
                         >
-                          Edit
-                        </button>
-                        <button
-                          onClick={() => deleteTask(task.id)}
-                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left"
-                        >
-                          Delete
-                        </button>
-                      </div>
-                    )}
-                  </div>
+                          <div className="flex items-center gap-1 w-5/12">
+                            <input type="checkbox" className="" />
+                            <div className="w-100 flex items-center">
+                              <button>
+                                <img src={dragicon} alt="Drag Icon" />
+                              </button>
+                              <span className="mr-2">
+                                <MdCheckCircle />
+                              </span>
+                              <p className="flex-1">{task.title}</p>
+                            </div>
+                          </div>
+                          <div className="w-3/12 hidden md:flex text-gray-500">
+                            {new Date(task.dueDate.seconds * 1000).toLocaleDateString()}
+                          </div>
+                          <div className="w-2/12 hidden md:flex items-center relative">
+                            <button onClick={() => toggleStatusDropdown(task.id)} className="bg-gray-200 text-gray-600 px-2 py-1 rounded text-xs mr-2">
+                              {task.status}
+                            </button>
+                            {statusDropdownTaskId === task.id && (
+                              <div className="absolute left-0 top-8 bg-white border border-gray-300 rounded shadow-md z-10">
+                                {["TO-DO", "IN-PROGRESS", "COMPLETED"].map((statusOption) => (
+                                  <button
+                                    key={statusOption}
+                                    className="block w-full px-4 py-2 text-left text-sm hover:bg-gray-100"
+                                    onClick={() => handleStatusChange(task.id, statusOption as Task["status"])}
+                                  >
+                                    {statusOption}
+                                  </button>
+                                ))}
+                              </div>
+                            )}
+                          </div>
+                          <div className="w-2/12 flex items-center">
+                            <span className="px-2 py-1 hidden md:flex rounded text-xs">{task.category}</span>
+                          </div>
+                          <div className="relative">
+                            <button onClick={() => setMenuOpenTaskId(task.id === menuOpenTaskId ? null : task.id)}>
+                              <BsThreeDots />
+                            </button>
+                            {menuOpenTaskId === task.id && (
+                              <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded shadow-lg">
+                                <button onClick={() => editTask(task.id)} className="block px-4 py-2 text-sm hover:bg-gray-100 w-full text-left">
+                                  Edit
+                                </button>
+                                <button onClick={() => deleteTask(task.id)} className="block px-4 py-2 text-sm hover:bg-gray-100 w-full text-left">
+                                  Delete
+                                </button>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      )}
+                    </Draggable>
+                  ))}
+                  {provided.placeholder}
                 </div>
-              ))}
-          </div>
+              )}
+            </Droppable>
+          </DragDropContext>
         )}
       </div>
 
