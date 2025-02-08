@@ -75,20 +75,36 @@ const TaskListComponent: React.FC<TaskListComponentProps> = ({
     setShowBulkActions(updatedSelection.length >= 2);
   };
 
-  const bulkDelete = () => {
-    const updatedTasks = tasks.filter((task) => !selectedTasks.includes(task.id));
-    setTasks(updatedTasks);
-    setSelectedTasks([]);
-    setShowBulkActions(false);
+  const bulkDelete = async () => {
+    try {
+      await Promise.all(
+        selectedTasks.map((taskId) => deleteTask(taskId))
+      );
+      console.log("Tasks deleted successfully!");
+    } catch (error) {
+      console.error("Error deleting tasks: ", error);
+    } finally {
+      setSelectedTasks([]);
+      setShowBulkActions(false);
+    }
   };
 
-  const bulkChangeStatus = (newStatus: Task["status"]) => {
-    const updatedTasks = tasks.map((task) =>
-      selectedTasks.includes(task.id) ? { ...task, status: newStatus } : task
-    );
-    setTasks(updatedTasks);
-    setSelectedTasks([]);
-    setShowBulkActions(false);
+  const bulkChangeStatus = async (newStatus: Task["status"]) => {
+    try {
+      await Promise.all(
+        tasks.map(async (task) => {
+          if (selectedTasks.includes(task.id)) {
+            await handleStatusChange(task.id, newStatus);
+          }
+        })
+      );
+      console.log("All statuses updated successfully!");
+    } catch (error) {
+      console.error("Error updating statuses: ", error);
+    } finally {
+      setSelectedTasks([]);
+      setShowBulkActions(false);
+    }
   };
 
   const onDragEnd = (result: any) => {
@@ -96,28 +112,21 @@ const TaskListComponent: React.FC<TaskListComponentProps> = ({
 
     const { source, destination, draggableId } = result;
 
-    // Clone the tasks array
     let updatedTasks = [...tasks];
 
-    // Find the dragged task index
     const draggedTaskIndex = updatedTasks.findIndex((task) => task.id === draggableId);
-    if (draggedTaskIndex === -1) return; // Exit if task not found
+    if (draggedTaskIndex === -1) return;
 
-    // Extract the dragged task
     const [draggedTask] = updatedTasks.splice(draggedTaskIndex, 1);
 
-    // Update status if moved across lists
     if (source.droppableId !== destination.droppableId) {
       draggedTask.status = destination.droppableId as "TO-DO" | "IN-PROGRESS" | "COMPLETED";
     }
 
-    // Filter tasks for the destination list
     const destinationTasks = updatedTasks.filter((task) => task.status === destination.droppableId);
 
-    // Insert task at correct position in the filtered list
     destinationTasks.splice(destination.index, 0, draggedTask);
 
-    // Rebuild the final task list with updated ordering
     updatedTasks = [
       ...updatedTasks.filter((task) => task.status !== destination.droppableId),
       ...destinationTasks,

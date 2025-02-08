@@ -480,6 +480,7 @@ const ListBoardFilter: React.FC<ListBoardFilterProps> = ({
           setTasks={setTasks}
           filteredTasks={filteredTasks ? filteredTasks : tasks}
           tasks={filteredTasks ? filteredTasks : tasks}
+          fetchTask={fetchTasks}
         />
       ) : (
         <TaskBoard
