@@ -19,7 +19,7 @@ const Header: React.FC = () => {
 
   return (
     <div>
-      <div className="hidden md:flex justify-between items-center row mb-4 p-15">
+      <div className="hidden md:flex justify-between items-center row mb-4 py-3 px-15">
         <h1 className="text-3xl flex items-center ">
           <img src={todo} alt="" />
           <span className="mr-2">TaskBuddy</span>

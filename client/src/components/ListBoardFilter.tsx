@@ -327,7 +327,7 @@ const ListBoardFilter: React.FC<ListBoardFilterProps> = ({
       <div className="flex justify-end items-end md:hidden">
         <button
           onClick={() => setModalShow(true)}
-          className="px-6 py-1  bg-[#7B1984] text-white rounded-3xl shadow-md hover:bg-purple-700 z-50 transition duration-300"
+          className=" py-1  bg-[#7B1984] text-white rounded-3xl shadow-md hover:bg-purple-700 z-50 transition duration-300"
         >
           ADD TASK
         </button>
