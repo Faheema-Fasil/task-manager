@@ -5,7 +5,7 @@ import useMediaQuery from "@mui/material/useMediaQuery"; // Media query detectio
 
 interface Props {
   description: string;
-  onChange: (event: React.ChangeEvent<HTMLTextAreaElement>) => void;
+  onChange: any;
   onAddTask: (taskData: { title: string; description: string; dueDate: Date; category: string; status: string }) => void;
   task: string;
   setTask: (task: string) => void;
@@ -73,7 +73,7 @@ const CreateTask: React.FC<CreateTaskProps & Props> = ({
           onChange={(e) => setTask(e.target.value)}
         />
 
-        <TextEditor />
+        <TextEditor value={description} onChange={onChange} />
 
         <div className="flex flex-col gap-3 mt-2">
           <div className="flex flex-col w-2/3">

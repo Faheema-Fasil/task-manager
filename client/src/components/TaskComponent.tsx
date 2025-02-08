@@ -20,6 +20,7 @@ interface Task {
     seconds: number;
     nanoseconds: number;
   };
+  attachment?: File | null;
 }
 
 interface TaskListComponentProps {

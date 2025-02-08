@@ -42,14 +42,13 @@ const Completed: React.FC<CompletedProps> = ({
   setTasks,
   handleDelete,
   handleEdit,
-  updateTaskStatus,
   menuOpenTaskId,
   setMenuOpenTaskId,
   filteredTasks,
   editTask,
 }) => {
   const completedTasks = filteredTasks.filter(
-    (task) => task.status === "COMPLETED"
+    (task: Task) => task.status === "COMPLETED"
   );
   const [openCompleted, setOpenCompleted] = useState(true);
   const [statusDropdownTaskId, setStatusDropdownTaskId] = useState<
@@ -102,7 +101,7 @@ const Completed: React.FC<CompletedProps> = ({
       <div className="w-full ">
         {openCompleted && (
           <div className="bg-gray-100 min-h-35 rounded-b-2xl shadow-md">
-            {completedTasks.map((task) => (
+            {completedTasks.map((task: Task) => (
               <div
                 key={task.id}
                 className="flex items-center justify-between p-3 border-b border-gray-300 hover:bg-gray-50 transition"

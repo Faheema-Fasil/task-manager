@@ -1,16 +1,14 @@
-import React, { useContext } from "react";
+import React from "react";
 import { FcGoogle } from "react-icons/fc";
 import taskimg from "../assets/task.png";
 import image from "../assets/Screenshot.png";
 import "tailwindcss";
-import { useAuth, AuthContext } from "../firebase";
-import { useNavigate } from "react-router-dom";
+import { useAuth} from "../firebase";
 
 export function LoginPage() {
   const { signInWithGoogle } = useAuth();
-  const navigate = useNavigate();
   const handleGoogleLogin = () => {
-    signInWithGoogle().catch((error) => {
+    signInWithGoogle().catch((error: any) => {
       // Handle the case where signInWithGoogle is not defined
       alert("Login Failed");
       console.error("signInWithGoogle is not defined");

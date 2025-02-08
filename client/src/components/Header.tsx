@@ -1,5 +1,5 @@
 import React from "react";
-import { useAuth } from "../firebase.tsx";
+import { useAuth } from "../firebase";
 import { useNavigate } from "react-router-dom";
 import logoutIcon from "../assets/logout_icon.png";
 import todo from "../assets/task_icon.png";

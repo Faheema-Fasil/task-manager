@@ -15,15 +15,22 @@ import TaskListComponent from "./TaskComponent";
 import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 import { CiEdit } from "react-icons/ci";
 
-type Task = {
+interface Task {
   id: string;
   title: string;
-  description: string;
-  dueDate: Timestamp;
+  dueDate: {
+    seconds: number;
+    nanoseconds: number;
+  };
   status: "TO-DO" | "IN-PROGRESS" | "COMPLETED";
-  category: string;
-  createdAt: Timestamp;
-};
+  category: "WORK" | "PERSONAL";
+  description: string;
+  createdAt: {
+    seconds: number;
+    nanoseconds: number;
+  };
+  attachment?: File | null;
+}
 
 const TaskList = ({
   tasks,
@@ -38,12 +45,7 @@ const TaskList = ({
   editTask: any;
   deleteTask: any;
 }) => {
-  const [isAddingTask, setIsAddingTask] = useState(false);
   const [openToDo, setOpenToDo] = useState(true);
-  const [newTask, setNewTask] = useState<Omit<Task, "status" | "category">>({
-    title: "",
-    due: Timestamp.now(),
-  });
   const [menuOpenTaskId, setMenuOpenTaskId] = useState<string | null>(null);
   const [showUpdateTask, setShowUpdateTask] = useState(false);
   const [selectedTasks, setSelectedTasks] = useState<string[]>([]);
@@ -98,25 +100,6 @@ const TaskList = ({
     }
   };
 
-  const handleDelete = (id: string) => {
-    setTasks(tasks.filter((task) => task.id !== id));
-  };
-
-  const addTask = () => {
-    if (!newTask.title || !newTask.dueDate) return;
-    setTasks([
-      ...tasks,
-      {
-        ...newTask,
-        status: "TO-DO",
-        category: "WORK",
-        id: (tasks.length + 1).toString(),
-      },
-    ]);
-    setNewTask({ title: "", dueDate: Timestamp.now() });
-    setIsAddingTask(false);
-  };
-
   const updateTaskStatus = (
     id: string,
     status: "TO-DO" | "IN-PROGRESS" | "COMPLETED"
@@ -126,27 +109,27 @@ const TaskList = ({
     );
   };
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setNewTask({ ...newTask, [e.target.name]: e.target.value });
-  };
+  // const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  //   setNewTask({ ...newTask, [e.target.name]: e.target.value });
+  // };
 
-  const handleDateClick = () => {
-    const datePicker = document.createElement("input");
-    datePicker.type = "date";
-    datePicker.value = newTask.dueDate
-      ? newTask.dueDate.toDate().toISOString().split("T")[0]
-      : "";
-    datePicker.className = "absolute opacity-0 pointer-events-none";
-    datePicker.addEventListener("change", () => {
-      setNewTask((prev) => ({
-        ...prev,
-        due: Timestamp.fromDate(new Date(datePicker.value)),
-      }));
-      datePicker.remove();
-    });
-    document.body.appendChild(datePicker);
-    datePicker.click();
-  };
+  // const handleDateClick = () => {
+  //   const datePicker = document.createElement("input");
+  //   datePicker.type = "date";
+  //   datePicker.value = newTask.dueDate
+  //     ? new Date(newTask.dueDate.seconds * 1000 + newTask.dueDate.nanoseconds / 1000000).toISOString().split("T")[0]
+  //     : "";
+  //   datePicker.className = "absolute opacity-0 pointer-events-none";
+  //   datePicker.addEventListener("change", () => {
+  //     setNewTask((prev) => ({
+  //       ...prev,
+  //       due: Timestamp.fromDate(new Date(datePicker.value)),
+  //     }));
+  //     datePicker.remove();
+  //   });
+  //   document.body.appendChild(datePicker);
+  //   datePicker.click();
+  // };
 
   const handleSaveTask = (updatedTask: Task) => {
     setTasks(

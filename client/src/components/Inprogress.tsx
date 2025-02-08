@@ -30,10 +30,9 @@ const Inprogress: React.FC<{
   handleEdit: (id: string) => void;
   setTasks: any;
   filteredTasks: any;
-  editTask,
+  editTask: any,
 }> = ({
   tasks,
-  updateTaskStatus,
   menuOpenTaskId,
   setMenuOpenTaskId,
   handleDelete,
@@ -80,7 +79,7 @@ const Inprogress: React.FC<{
       setStatusDropdownTaskId(null);
     };
 
-    const inProgressTasks = filteredTasks.filter((task) => task.status === "IN-PROGRESS");
+    const inProgressTasks = filteredTasks.filter((task: Task) => task.status === "IN-PROGRESS");
 
     return (
       <div className="w-full">
@@ -95,7 +94,7 @@ const Inprogress: React.FC<{
         <div className="w-full">
           {openInProgress && (
             <div className="bg-gray-100 min-h-35 rounded-b-2xl shadow-md">
-              {inProgressTasks.map((task, index) => (
+              {inProgressTasks.map((task: Task, index: number) => (
                 <div
                   key={index}
                   className="flex items-center justify-between p-3 border-b border-gray-300 hover:bg-gray-50 transition"

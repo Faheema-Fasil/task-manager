@@ -7,7 +7,7 @@ interface UpdateTaskProps {
   onHide: () => void;
   task: Task;
   editTask: any;
-  onSave: (updatedTask: Task) => void;
+  onSave: any;
 }
 
 interface Task {
@@ -24,6 +24,7 @@ interface Task {
     seconds: number;
     nanoseconds: number;
   };
+  attachment?: File | null;
 }
 
 const UpdateTask: React.FC<UpdateTaskProps> = ({

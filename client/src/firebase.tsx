@@ -65,7 +65,7 @@ const AuthContext = createContext<AuthContextType | null>(null);
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
-  const [currentUser, setCurrentUser] = useState<UserProps | null>(
+  const [currentUser, setCurrentUser] = useState<any>(
     localStorage.getItem("User") ? JSON.parse(localStorage.getItem("User")!) : null
   );
   const provider = new GoogleAuthProvider();
@@ -87,7 +87,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       const result = await signInWithPopup(auth, provider);
       const credential = GoogleAuthProvider.credentialFromResult(result);
       const token = credential?.accessToken;
-      const user: UserProps = result.user;
+      const user: any = result.user;
       localStorage.setItem("User", JSON.stringify(user));
       setCurrentUser(user);
       console.log("Google Sign-In Success:", user);

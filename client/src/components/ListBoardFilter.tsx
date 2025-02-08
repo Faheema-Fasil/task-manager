@@ -278,7 +278,7 @@ const ListBoardFilter: React.FC<ListBoardFilterProps> = ({
     setDescription(event.target.value);
   };
 
-  const handleSearchClick = (e) => {
+  const handleSearchClick = (e: any) => {
     console.log("eeeeeee", e.target.value);
   };
 
@@ -295,7 +295,7 @@ const ListBoardFilter: React.FC<ListBoardFilterProps> = ({
   const handleDueDateChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     setSelectedDueDate(event.target.value);
   };
-  const handleSearchEvent = (event: React.ChangeEvent<HTMLSelectElement>) => {
+  const handleSearchEvent = (event: any) => {
     const searchValue = event.target.value;
     const filteredTasks = tasks.filter((task) => {
       return (
@@ -475,19 +475,18 @@ const ListBoardFilter: React.FC<ListBoardFilterProps> = ({
 
       {openList ? (
         <TaskList
-          title="In Progress"
           editTask={editTask}
           deleteTask={deleteTask}
           setTasks={setTasks}
           filteredTasks={filteredTasks ? filteredTasks : tasks}
           tasks={filteredTasks ? filteredTasks : tasks}
-          isOpen={openSections["IN-PROGRESS"]}
-          onToggle={() => toggleSection("IN-PROGRESS")}
         />
       ) : (
         <TaskBoard
           tasks={filteredTasks ? filteredTasks : tasks}
           setTasks={setTasks}
+          editTask={editTask}
+          deleteTask={deleteTask}
         />
       )}
     </div>

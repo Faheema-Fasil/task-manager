@@ -15,9 +15,9 @@ interface Task {
 
 interface TaskBoardProps {
   tasks: Task[];
-  setTasks: React.Dispatch<React.SetStateAction<Task[]>>;
+  setTasks: any;
   editTask: (task: Task) => void;
-  deleteTask: (task: Task) => void;
+  deleteTask: any;
 }
 
 const TaskBoard: React.FC<TaskBoardProps> = ({ tasks, setTasks, editTask, deleteTask }) => {
