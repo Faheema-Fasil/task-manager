@@ -8,5 +8,6 @@ export default defineConfig({
   optimizeDeps: {
     exclude: ['@babel/parser'],
   },
+  base: '/',
 })
 
