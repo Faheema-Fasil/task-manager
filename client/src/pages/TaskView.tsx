@@ -22,13 +22,13 @@ const TaskBuddy: React.FC = () => {
       <div className="bg-white rounded-lg shadow-md">
         <Header />
 
-      <div className="p-4 md:p-15">
+        <div className="p-4 md:p-15">
 
-        <ListBoardFilter
-          toggleSection={toggleSection}
-          openSections={openSections}
+          <ListBoardFilter
+            toggleSection={toggleSection}
+            openSections={openSections}
           />
-          </div>
+        </div>
       </div>
     </div>
   );

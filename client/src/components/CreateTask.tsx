@@ -45,10 +45,10 @@ const CreateTask: React.FC<CreateTaskProps & Props> = ({
       category,
       status,
     };
-    
+
     onAddTask(taskData);
     console.log("Task added:", taskData);
-    
+
     setTask("");
   };
 

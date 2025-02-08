@@ -388,54 +388,54 @@ const ListBoardFilter: React.FC<ListBoardFilterProps> = ({
         <div className="flex flex-col  justify-between w-full md:flex-row md:items-center gap-2 ">
           <div className="flex items-center gap-2 ">
 
-          <div className="hidden md:flex text-xs  text-gray-500">Filter by: </div>
-          <div className="flex">
-            <select
-              className="border bg-white border-gray-300 text-sm text-gray-500 rounded-full px-2 py-1 mr-2"
-              value={selectedCategory}
-              onChange={handleCategoryChange}
-            >
-              <option className="text-gray-500" selected disabled>
-                Category
-              </option>
-              <option value="">All</option>
-              {categories.map((category) => (
-                <option
-                  key={category}
-                  style={{
-                    color: "black",
-                    backgroundColor: "white",
-                    fontWeight: "bold",
-                  }}
-                  value={category}
-                >
-                  {category}
+            <div className="hidden md:flex text-xs  text-gray-500">Filter by: </div>
+            <div className="flex">
+              <select
+                className="border bg-white border-gray-300 text-sm text-gray-500 rounded-full px-2 py-1 mr-2"
+                value={selectedCategory}
+                onChange={handleCategoryChange}
+              >
+                <option className="text-gray-500" selected disabled>
+                  Category
                 </option>
-              ))}
-            </select>
-            <select
-              className="border border-gray-300 text-sm text-gray-500 rounded-full px-2 py-1 mr-2"
-              value={selectedDueDate}
-              onChange={handleDueDateChange}
-            >
-              <option selected disabled>
-                Due Date
-              </option>
-              {dueDateOptions.map((option) => (
-                <option
-                  key={option.value}
-                  style={{
-                    color: "black",
-                    backgroundColor: "white",
-                    fontWeight: "bold",
-                  }}
-                  value={option.value}
-                >
-                  {option.label}
+                <option value="">All</option>
+                {categories.map((category) => (
+                  <option
+                    key={category}
+                    style={{
+                      color: "black",
+                      backgroundColor: "white",
+                      fontWeight: "bold",
+                    }}
+                    value={category}
+                  >
+                    {category}
+                  </option>
+                ))}
+              </select>
+              <select
+                className="border border-gray-300 text-sm text-gray-500 rounded-full px-2 py-1 mr-2"
+                value={selectedDueDate}
+                onChange={handleDueDateChange}
+              >
+                <option selected disabled>
+                  Due Date
                 </option>
-              ))}
-            </select>
-          </div>
+                {dueDateOptions.map((option) => (
+                  <option
+                    key={option.value}
+                    style={{
+                      color: "black",
+                      backgroundColor: "white",
+                      fontWeight: "bold",
+                    }}
+                    value={option.value}
+                  >
+                    {option.label}
+                  </option>
+                ))}
+              </select>
+            </div>
           </div>
           <div className="flex items-center gap-6 justify-end md:gap-2 md:flex-row flex-col md:items-start md:w-auto w-full" >
             <div className="relative flex mt-2 w-full md:w-auto">

@@ -47,15 +47,15 @@ const TaskList = ({
   const [menuOpenTaskId, setMenuOpenTaskId] = useState<string | null>(null);
   const [showUpdateTask, setShowUpdateTask] = useState(false);
   const [selectedTasks, setSelectedTasks] = useState<string[]>([]);
-    const [showBulkActions, setShowBulkActions] = useState(false);
+  const [showBulkActions, setShowBulkActions] = useState(false);
 
-    const [bulkStatusDropdown, setBulkStatusDropdown] = useState(false);
+  const [bulkStatusDropdown, setBulkStatusDropdown] = useState(false);
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   const [statusDropdownTaskId, setStatusDropdownTaskId] = useState<
     string | null
   >(null);
 
-  
+
 
   const toggleStatusDropdown = (taskId: string) => {
     setStatusDropdownTaskId(statusDropdownTaskId === taskId ? null : taskId);
@@ -162,7 +162,7 @@ const TaskList = ({
       updatedSelection.push(taskId);
     }
     setSelectedTasks(updatedSelection);
-    
+
     setShowBulkActions(updatedSelection.length >= 2);
   };
 
@@ -183,42 +183,42 @@ const TaskList = ({
   };
   const onDragEnd = (result: any) => {
     if (!result.destination) return;
-  
+
     const { source, destination, draggableId } = result;
-  
+
     // Clone the tasks array
     let updatedTasks = [...tasks];
-  
+
     // Find the dragged task index
     const draggedTaskIndex = updatedTasks.findIndex((task) => task.id === draggableId);
     if (draggedTaskIndex === -1) return; // Exit if task not found
-  
+
     // Extract the dragged task
     const [draggedTask] = updatedTasks.splice(draggedTaskIndex, 1);
-  
+
     // Update status if moved across lists
     if (source.droppableId !== destination.droppableId) {
       draggedTask.status = destination.droppableId as "TO-DO" | "IN-PROGRESS" | "COMPLETED";
     }
-  
+
     // Filter tasks for the destination list
     const destinationTasks = updatedTasks.filter((task) => task.status === destination.droppableId);
-  
+
     // Insert task at correct position in the filtered list
     destinationTasks.splice(destination.index, 0, draggedTask);
-  
+
     // Rebuild the final task list with updated ordering
     updatedTasks = [
       ...updatedTasks.filter((task) => task.status !== destination.droppableId),
       ...destinationTasks,
     ];
-  
+
     setTasks(updatedTasks);
   };
-  
-  
-  
-  
+
+
+
+
 
   const todoTasks: any = filteredTasks.filter((task: any) => task.status === "TO-DO");
 
@@ -267,9 +267,9 @@ const TaskList = ({
               {(provided) => (
                 <div ref={provided.innerRef} {...provided.droppableProps} className="bg-gray-100 min-h-35 rounded-b-2xl shadow-md">
                   {todoTasks.map((task: any, index: any) => (
-                    
+
                     <Draggable key={task.id} draggableId={task.id} index={index}>
-                      
+
                       {(provided) => (
                         <div
                           ref={provided.innerRef}
@@ -279,8 +279,8 @@ const TaskList = ({
                         >
                           <div className="flex items-center gap-1 w-5/12">
                             <input type="checkbox" checked={selectedTasks.includes(task.id)}
-                            onChange={() => toggleTaskSelection(task.id)}
-                            className="mr-2" />
+                              onChange={() => toggleTaskSelection(task.id)}
+                              className="mr-2" />
                             <div className="w-100 flex items-center">
                               <button>
                                 <img src={dragicon} alt="Drag Icon" />
@@ -322,10 +322,10 @@ const TaskList = ({
                             {menuOpenTaskId === task.id && (
                               <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded shadow-lg">
                                 <button onClick={() => editTask(task.id)} className="block flex items-center gap-2 px-4 py-2 text-sm hover:bg-gray-100 w-full text-left">
-                                 <CiEdit/> <span>Edit</span>
+                                  <CiEdit /> <span>Edit</span>
                                 </button>
                                 <button onClick={() => deleteTask(task.id)} className="block flex items-center gap-2 px-4 py-2 text-sm hover:bg-gray-100 w-full text-left">
-                                 <MdDelete className="text-red-500"/> <span className="text-red-500">Delete</span>
+                                  <MdDelete className="text-red-500" /> <span className="text-red-500">Delete</span>
                                 </button>
                               </div>
                             )}
@@ -355,7 +355,7 @@ const TaskList = ({
           handleEdit={handleEdit}
           setTasks={setTasks}
           editTask={editTask}
-          
+
         />
       </div>
       <div className="mt-4">
@@ -371,7 +371,7 @@ const TaskList = ({
           handleEdit={handleEdit}
           setTasks={setTasks}
           editTask={editTask}
-          
+
         />
       </div>
 

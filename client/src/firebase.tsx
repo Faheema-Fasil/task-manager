@@ -1,4 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
+import { toast } from 'react-toastify';
+
 import {
   getAuth,
   onAuthStateChanged,
@@ -89,6 +91,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       localStorage.setItem("User", JSON.stringify(user));
       setCurrentUser(user);
       console.log("Google Sign-In Success:", user);
+      toast("Logged in successfully!"); 
+
+
     } catch (error: any) {
       console.error("Google Sign-In Error:", error.message);
       setCurrentUser(null);

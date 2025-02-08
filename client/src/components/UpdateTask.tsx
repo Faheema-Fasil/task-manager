@@ -108,21 +108,19 @@ const UpdateTask: React.FC<UpdateTaskProps> = ({
                     Task Category*
                     <div className="flex gap-2 text-xs">
                       <button
-                        className={`border border-gray-300 rounded-full px-2 py-1 ${
-                          updatedTask.category === "WORK"
+                        className={`border border-gray-300 rounded-full px-2 py-1 ${updatedTask.category === "WORK"
                             ? "bg-gray-200"
                             : "hover:bg-gray-100"
-                        }`}
+                          }`}
                         onClick={() => handleCategoryChange("WORK")}
                       >
                         Work
                       </button>
                       <button
-                        className={`border border-gray-300 rounded-full px-2 py-1 ${
-                          updatedTask.category === "PERSONAL"
+                        className={`border border-gray-300 rounded-full px-2 py-1 ${updatedTask.category === "PERSONAL"
                             ? "bg-gray-200"
                             : "hover:bg-gray-100"
-                        }`}
+                          }`}
                         onClick={() => handleCategoryChange("PERSONAL")}
                       >
                         Personal

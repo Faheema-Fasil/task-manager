@@ -44,7 +44,7 @@ const TaskBuddy: React.FC = () => {
     <div className="container mx-auto p-4 bg-gray-100 min-h-screen">
       <div className="bg-white rounded-lg shadow-md p-6">
         <h1 className="text-3xl   mb-4">
-          <span className="mr-2 flex items-center" ><MdContentPaste /><span> TaskBuddy</span></span> 
+          <span className="mr-2 flex items-center" ><MdContentPaste /><span> TaskBuddy</span></span>
         </h1>
 
         <div className=" mb-4">
@@ -52,7 +52,7 @@ const TaskBuddy: React.FC = () => {
             <button className="mr-2 text-gray-600 font-semibold underline flex items-center"><FaListUl /><span> &nbsp; List</span>
             </button>
             <button className="text-gray-600 flex items-center"><CiViewBoard />
-            <span>Board</span> </button>
+              <span>Board</span> </button>
           </div>
           <div className="flex items-center mt-2">
             <p className="text-gray-600 rounded px-4 py-2 mr-2">Filter by:</p>
@@ -64,7 +64,7 @@ const TaskBuddy: React.FC = () => {
             </select>
           </div>
         </div>
-        <hr className='mb-4 mt-5 text-gray-300'/>
+        <hr className='mb-4 mt-5 text-gray-300' />
 
         {/* Add Task Section */}
         {isAddingTask ? (

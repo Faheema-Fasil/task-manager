@@ -39,7 +39,10 @@ const TextEditor: React.FC<TextEditorProps> = ({ value, onChange }) => {
       </div>
 
       <div className="quill-bottom-toolbar bg-gray-50 border-t border-gray-300 p-2 flex justify-between items-center">
-        <div id="custom-toolbar" className="flex text-sm items-center space-x-2">
+        <div
+          id="custom-toolbar"
+          className="flex text-sm items-center space-x-2"
+        >
           <button className="ql-bold">B</button>
           <button className="ql-italic">/</button>
           <button className="ql-strike">S</button>

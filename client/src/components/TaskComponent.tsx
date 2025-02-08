@@ -34,7 +34,7 @@ interface TaskListComponentProps {
   deleteTask: (id: string) => void;
   handleEdit: (id: string) => void;
   editTask: (task: Partial<Task>) => Promise<void>;
-  
+
 }
 
 const TaskListComponent: React.FC<TaskListComponentProps> = ({
@@ -49,7 +49,7 @@ const TaskListComponent: React.FC<TaskListComponentProps> = ({
   deleteTask,
   handleEdit,
   editTask,
- 
+
 }) => {
 
   const [isOpen, setIsOpen] = useState(true);
@@ -92,43 +92,43 @@ const TaskListComponent: React.FC<TaskListComponentProps> = ({
 
   const onDragEnd = (result: any) => {
     if (!result.destination) return;
-  
+
     const { source, destination, draggableId } = result;
-  
+
     // Clone the tasks array
     let updatedTasks = [...tasks];
-  
+
     // Find the dragged task index
     const draggedTaskIndex = updatedTasks.findIndex((task) => task.id === draggableId);
     if (draggedTaskIndex === -1) return; // Exit if task not found
-  
+
     // Extract the dragged task
     const [draggedTask] = updatedTasks.splice(draggedTaskIndex, 1);
-  
+
     // Update status if moved across lists
     if (source.droppableId !== destination.droppableId) {
       draggedTask.status = destination.droppableId as "TO-DO" | "IN-PROGRESS" | "COMPLETED";
     }
-  
+
     // Filter tasks for the destination list
     const destinationTasks = updatedTasks.filter((task) => task.status === destination.droppableId);
-  
+
     // Insert task at correct position in the filtered list
     destinationTasks.splice(destination.index, 0, draggedTask);
-  
+
     // Rebuild the final task list with updated ordering
     updatedTasks = [
       ...updatedTasks.filter((task) => task.status !== destination.droppableId),
       ...destinationTasks,
     ];
-  
+
     setTasks(updatedTasks);
   };
-  
-  
-  
-  
-  
+
+
+
+
+
 
   return (
     <div className="w-full">
@@ -164,8 +164,8 @@ const TaskListComponent: React.FC<TaskListComponentProps> = ({
       {isOpen && (
         <div className="bg-gray-100 min-h-35 rounded-b-2xl shadow-md">
           <DragDropContext onDragEnd={onDragEnd}>
-          <Droppable droppableId={status}>
-            
+            <Droppable droppableId={status}>
+
               {(provided) => (
                 <div {...provided.droppableProps} ref={provided.innerRef}>
                   {filteredTasks.map((task, index) => (
@@ -178,12 +178,12 @@ const TaskListComponent: React.FC<TaskListComponentProps> = ({
                           className="flex items-center justify-between p-3 border-b border-gray-300 hover:bg-gray-50 transition"
                         >
                           <div className="flex items-center gap-1 w-5/12">
-                          <input
-                            type="checkbox"
-                            checked={selectedTasks.includes(task.id)}
-                            onChange={() => toggleTaskSelection(task.id)}
-                            className="mr-2"
-                          />
+                            <input
+                              type="checkbox"
+                              checked={selectedTasks.includes(task.id)}
+                              onChange={() => toggleTaskSelection(task.id)}
+                              className="mr-2"
+                            />
                             <button>
                               <img src={dragicon} alt="Drag Icon" />
                             </button>
